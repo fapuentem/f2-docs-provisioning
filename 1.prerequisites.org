@@ -1,4 +1,4 @@
-#+TITLE: Prerequisites
+#+TITLE: 1. Prerequisites
 #+AUTHOR: Visiontech Consulting Inc.
 #+DATE: <2025-04-09 Wed>
 #+OPTIONS: toc:nil num:nil
@@ -9,7 +9,7 @@ Before starting the provisioning process, ensure you have the following hardware
 
 - *Jetson Orin Module*: Jetson Orin NX 8GB
 - *Carrier Board:* F2 Carrier board v2.x and v3.x
-- **Power Supply:**
+- *Power Supply:*
   - Voltage: 12.5 - 15.0 V
   - Current: 5A or greater
 - *USB Cable:*
@@ -50,6 +50,6 @@ Before starting the provisioning process, ensure you have the following hardware
 
 - *Screwdriver Set (if assembly is required):* Depending on your carrier board and Jetson module, you might need a screwdriver to secure the module or install storage.
 - *ESD Protection (Wrist Strap):* Highly recommended to prevent electrostatic discharge that could damage sensitive electronic components during handling.
-- Fanstel flasher board. (It is required for carrier boards < v3.1)
+- Fanstel flasher board. It is required for carrier boards < v3.1.
 
 Once you have gathered all the necessary prerequisites, you can proceed with flashing the Jetson Orin module.

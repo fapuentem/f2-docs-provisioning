@@ -1,0 +1,84 @@
+#+TITLE: 2. Flashing the Jetson Orin Module
+#+AUTHOR: Visiontech Consulting Inc.
+#+DATE: <2025-04-09 Wed>
+#+OPTIONS: toc:nil num:nil
+
+This section details the process of flashing the operating system onto your Jetson Orin module using the NVIDIA SDK Manager on an Ubuntu host machine.
+
+* Preparation
+
+Before starting the flashing process, ensure the following:
+
+- *Host Computer Setup:*
+  - Your Ubuntu host computer meets the software and hardware requirements outlined in [[file:1.prerequisites.org][Prerequisites]].
+  - NVIDIA SDK Manager is installed on your host computer. If not, follow the instructions in the [[file:2.jetson-orin-flash.org::*Downloading SDK Manager/JetPack][Downloading SDK Manager/JetPack]] section.
+  - Ensure you have a stable internet connection. The flashing process involves downloading large files.
+- *Jetson Orin Module and Carrier Board (F2):*
+  - The Jetson Orin module is securely installed on your F2 custom carrier board. Refer to your carrier board's documentation for installation instructions if needed.
+  - Have the USB cable required (USB Type-A to Type-C) for flashing connected to your host computer and within easy reach to connect to the F2 carrier board (RECOVERY connector).
+    [[./images/recovery-usb-conn.png]]
+  - Locate the *Recovery Button* (S1) on your F2 carrier board. This button is crucial for putting the Jetson Orin module into Force Recovery Mode, which is necessary for flashing.
+    [[./images/recovery-button.png]]
+- *Power Supply:* Have the correct power supply for your F2 carrier board ready to be connected after the module is in Force Recovery Mode.
+
+* Downloading SDK Manager/JetPack
+
+1. *Open NVIDIA SDK Manager:* You can usually find it in your Ubuntu application menu or by running the ~sdkmanager~ command in your terminal.
+2. *Log in:* Enter your NVIDIA Developer account credentials.
+3. *Select Target Hardware:*
+   - In the "Product Category" block, choose the *Jetson* family.
+   - Then, select your specific *Jetson Orin module* (e.g., Jetson Orin NX series, Jetson Orin Nano series).
+   - Under "SDK Version," the default (usually the latest JetPack version) is generally recommended. We use *JetPack 5.1.3*.
+   - Also, choose *DeepStream* in "Additional SDKs".
+   [[./images/sdkmanager-step-1.png]]
+4. *Select Host Machine:* Ensure your host machine is correctly identified (should be your Ubuntu system).
+5. *Proceed to Next Step:* Click on the "Continue" button.
+
+* Flashing Procedure (using SDK Manager)
+
+1. *Select Components:* In the "Details and License" step, you will see various options for SDK components.
+   - For a basic flash, ensure that the *Jetson Linux* and *Jetson Runtime* are selected. You can deselect other components like CUDA, cuDNN, TensorRT, etc., if you only want to flash the base operating system initially. You can install these later if needed.
+   - Carefully review the selected components and their versions.
+2. *Review Licenses:* Accept the necessary licenses by checking the "I accept the terms and conditions" boxes.
+   [[./images/sdkmanager-step2.png]]
+3. *Initiate Flashing:* Click on the "Continue" button to begin the download and flashing process.
+   In the "Recovery mode setup" choose "Manual Setup", and in item 8 use a default password *nvidia* and user *nvidia*.
+   [[./images/recovery-preconfig.png]]
+4. *Put Jetson Orin into Force Recovery Mode:* SDK Manager will guide you through the steps to put your Jetson Orin module into Force Recovery Mode. This typically involves the following sequence:
+   a. *Ensure the F2 carrier board is powered OFF.*
+   b. *Connect the USB cable* from your host computer to the designated USB port on the F2 carrier board (refer to your carrier board's documentation for the correct port (RECOVERY connector), often a USB Type-C or Micro-USB port labeled for flashing).
+   c. *Press and hold the Recovery Button* on the F2 carrier board.
+   d. *While still holding the Recovery Button, briefly press and release the Power Button* on the F2 carrier board.
+   e. *Release the Recovery Button.*
+   f. *Power ON the F2 carrier board* (if it didn't power on automatically).
+5. *SDK Manager Detection:* SDK Manager should now detect your Jetson Orin module in Force Recovery Mode. If it doesn't, refer to the [[file:2.jetson-orin-flash.org::*Troubleshooting Flashing Issues][Troubleshooting Flashing Issues]] section.
+6. *Flashing Begins:* Once the module is detected, SDK Manager will automatically start downloading the necessary files and flashing the operating system onto the Jetson Orin module. This process can take a significant amount of time depending on your internet speed and system resources.
+7. *Monitor the Progress:* Keep an eye on the SDK Manager window for progress updates and any error messages.
+8. *Flashing Complete:* Once the process is finished successfully, SDK Manager will display a "Flash Successful" message. You can now disconnect the USB cable and power cycle your Jetson Orin module on the F2 carrier board. It should boot into the newly flashed operating system.
+
+* Flashing Procedure (using JetPack CLI)
+
+*(This section is intentionally left out as per the initial thought process. If the user requests it later, I can add it.)*
+
+* Troubleshooting Flashing Issues
+
+Here are some common issues that might occur during the flashing process and potential solutions:
+
+- *SDK Manager not detecting the Jetson Orin in Force Recovery Mode:*
+  - *Incorrect USB Cable:* Ensure you are using the correct and a high-quality USB cable. Try a different USB cable if possible.
+  - *Incorrect USB Port:* Verify you are connecting the USB cable to the correct port on your F2 carrier board intended for flashing. Consult your carrier board's documentation.
+  - *Driver Issues on Host:* Sometimes, the host computer might not have the necessary USB drivers. SDK Manager usually handles this, but you can try restarting your host computer.
+  - *Incorrect Force Recovery Mode Procedure:* Double-check the steps for entering Force Recovery Mode for your F2 carrier board. The timing of pressing and releasing the buttons is crucial.
+  - *Virtual Machine Issues:* If you are running SDK Manager in a virtual machine, it can sometimes cause issues with USB device detection. Try running it directly on your host operating system if possible.
+- *Download Errors:*
+  - *Network Connectivity:* Ensure you have a stable internet connection. Try restarting your router or switching to a different network if possible.
+  - *Disk Space:* Verify that you have enough free disk space on your host computer to download and store the SDK components.
+- *Flashing Errors during the process:*
+  - *Check SDK Manager Logs:* SDK Manager usually provides detailed logs that can help identify the cause of the error. Look for error messages and try searching for them online.
+  - *Try Flashing Again:* Sometimes, a temporary glitch can cause the flash to fail. Try restarting SDK Manager and repeating the flashing process.
+  - *Consult NVIDIA Developer Forums:* If you encounter persistent issues, the NVIDIA Developer forums ([[https://forums.developer.nvidia.com/]]) are a great resource for finding solutions to common problems. Search for similar issues or post a new question with detailed information about your setup and the error messages you are seeing.
+- *Carrier Board Specific Issues:* Consult the documentation for your F2 custom carrier board for any specific flashing instructions or known issues.
+
+If you continue to experience problems, carefully review the NVIDIA SDK Manager documentation and the documentation for your F2 carrier board for more detailed troubleshooting steps.
+
+

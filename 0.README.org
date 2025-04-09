@@ -1,4 +1,4 @@
-#+TITLE: Provisioning Guide for Jetson Orin Carrier Board
+#+TITLE: 0. README
 #+AUTHOR: Visiontech Consulting Inc.
 #+DATE: <2025-04-09 Wed>
 #+OPTIONS: toc:nil num:nil
