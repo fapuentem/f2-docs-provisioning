@@ -1,0 +1,55 @@
+#+TITLE: Prerequisites
+#+AUTHOR: Visiontech Consulting Inc.
+#+DATE: <2025-04-09 Wed>
+#+OPTIONS: toc:nil num:nil
+
+Before starting the provisioning process, ensure you have the following hardware, software, and tools available.
+
+* Hardware Requirements
+
+- *Jetson Orin Module*: Jetson Orin NX 8GB
+- *Carrier Board:* F2 Carrier board v2.x and v3.x
+- **Power Supply:**
+  - Voltage: 12.5 - 15.0 V
+  - Current: 5A or greater
+- *USB Cable:*
+  - Type: USB Type-A to Type-C.
+  - Recommendation: A high-quality USB cable is recommended to avoid data transfer issues during flashing.
+- *Host Computer:*
+  - Operating System: Ubuntu GNU/Linux 20.04 LTS or 22.04 LTS is recommended for optimal compatibility with NVIDIA SDK Manager).
+  - Processor: i5
+  - RAM: 8GB or more recommended
+  - Disk Space: At least 50GB free disk space for downloading and storing SDK components.
+- *Ethernet Cable (Optional):* Recommended for a stable network connection during the initial setup and software installations. Your carrier board will need an Ethernet port.
+- *Storage:*
+  - Type: NVMe SSD
+  - Size: 128GB or larger NVMe SSD. Refer to your carrier board's documentation for supported storage types and sizes.
+
+* Software Requirements (on the Host Computer - Ubuntu)
+
+- *NVIDIA SDK Manager:*
+  - Download and install the latest version of NVIDIA SDK Manager from the official NVIDIA Developer website: [[https://developer.nvidia.com/sdk-manager]]
+  - You will need an NVIDIA Developer account to download and use SDK Manager.
+- *Dependencies for SDK Manager:*
+  - Ensure your Ubuntu system has the necessary dependencies installed. SDK Manager usually prompts for these during installation, but it's good to be aware. Common dependencies might include:
+    - ~curl~
+    - ~wget~
+    - ~python3~
+    - ~python3-pip~
+    - ~rsync~
+    - ~unzip~
+    - ~zip~
+    - You might need to enable the ~universe~ repository on your Ubuntu system if you haven't already:
+      #+BEGIN_SRC sh
+      sudo add-apt-repository universe
+      sudo apt update
+      #+END_SRC
+- *Specific Python and pip versions:* SDK Manager might have specific requirements for Python and pip versions. It's generally recommended to use the versions that come with a recent stable Ubuntu release. If you encounter issues, consult the NVIDIA SDK Manager documentation for version compatibility.
+
+* Tools
+
+- *Screwdriver Set (if assembly is required):* Depending on your carrier board and Jetson module, you might need a screwdriver to secure the module or install storage.
+- *ESD Protection (Wrist Strap):* Highly recommended to prevent electrostatic discharge that could damage sensitive electronic components during handling.
+- Fanstel flasher board. (It is required for carrier boards < v3.1)
+
+Once you have gathered all the necessary prerequisites, you can proceed with flashing the Jetson Orin module.
