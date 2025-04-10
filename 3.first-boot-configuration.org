@@ -29,6 +29,7 @@ After successfully flashing the Jetson Orin module, this section guides you thro
 
    #+BEGIN_QUOTE
    *user:* nvidia
+
    *password:* nvidia
    #+END_QUOTE
 
