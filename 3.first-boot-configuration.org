@@ -8,16 +8,25 @@ After successfully flashing the Jetson Orin module, this section guides you thro
 * Powering On for the First Time
 
 1. *Connect Serial Terminal:* It is highly recommended to connect to the Jetson Orin's serial console for the initial configuration and to monitor the boot process.
+
    a. *Connect USB Cable:* Connect a USB cable from your host computer to the designated terminal connector on your F2 carrier board (J15). Refer to your carrier board's documentation for the exact port.
+
    [[./images/f2-board-terminal-conn.png]]
+
    b. *Open Terminal on Host:* Open a terminal window on your Ubuntu host computer.
+
    c. *Use ~screen~ Command:* Use the ~screen~ command to establish a serial connection to the Jetson Orin. You might need to adjust ~/dev/ttyUSB0~ depending on the actual serial port assigned to your board.
+
       #+BEGIN_SRC sh
         sudo screen /dev/ttyUSB0 115200
       #+END_SRC
+
    d. *Power On the Jetson Orin:* Connect the power supply to your F2 carrier board.
+
    e. *Observe Boot Process:* You should see the boot messages scrolling in your ~screen~ session. This will allow you to monitor the startup process and identify any potential issues early on.
+
 3. *Login:* Once the system has booted, you might be prompted for a login.
+
    #+BEGIN_QUOTE
    *user:* nvidia
    *password:* nvidia
@@ -29,28 +38,38 @@ After successfully flashing the Jetson Orin module, this section guides you thro
 Once you have access to the Jetson Orin either through the serial console, you can proceed with the initial system configuration.
 
 1. *Update and Upgrade Packages:* It's a good practice to update the package lists and upgrade existing packages to the latest versions.
+
    #+BEGIN_SRC sh
      sudo apt-get update
      sudo apt-get upgrade -y
    #+END_SRC
+
 2. *Install Essential Software and Tools:* Install commonly used tools and libraries.
+
    #+BEGIN_SRC sh
      sudo apt-get install git curl python3-pip stm32flash jq libqmi-utils udhcpc htop sysstat python3.8-venv -y
    #+END_SRC
+
 3. *Install ~jetson-stats~:* This utility provides useful information about the Jetson's performance and resource usage.
+
    #+BEGIN_SRC sh
      sudo pip3 install -U jetson-stats
    #+END_SRC
+
 4. *Install ~emacs~:* If you prefer the Emacs editor, you can install it using Snap.
+
    #+BEGIN_SRC sh
      sudo snap install emacs --classic --beta
    #+END_SRC
+
 5. *Download Prelude*
+
    #+BEGIN_SRC sh
      curl -L https://git.io/epre | sh
    #+END_SRC
+
 After completing these initial configuration steps, your Jetson Orin module on the F2 carrier board should be ready for further network configuration and software installations.
 
 * Closing the Serial Terminal
 
-To close the `screen` session on your host computer, press `Ctrl+A` followed by `K`. You will be prompted to confirm if you want to kill the window; type `y` and press Enter.
+To close the ~screen~ session on your host computer, press ~Ctrl+A~ followed by ~K~. You will be prompted to confirm if you want to kill the window; type ~y~ and press Enter.
