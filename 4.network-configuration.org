@@ -12,6 +12,7 @@ If you have connected an Ethernet cable to your F2 carrier board, it will typica
 *DHCP Configuration:*
 
 1. *Check Connection:* Ensure the Ethernet cable is securely connected to both the carrier board(/ETHERNET(Main)/ connector) and your network infrastructure (router, switch, etc.).
+
    [[./images/ethernet-connector.png]]
 
 2. *Verify IP Address:* Open a terminal on your Jetson Orin and use the ~ip addr~ or ~ifconfig~ command to check if an IP address has been assigned to the Ethernet interface (usually ~eth2~).
@@ -34,11 +35,13 @@ F2 carrier board has Wi-Fi capabilities, you can connect to a wireless network.
    #+BEGIN_SRC sh
      sudo nmtui
    #+END_SRC
+
    [[./images/nmtui-network.png]]
 
  2. *Scan for Networks:*
 
    This will display a list of available Wi-Fi networks (SSIDs).
+
    [[./images/nmtui-wifi-networks.png]]
 
 *Connecting to a Network using ~wpa_supplicant~:*
