@@ -17,9 +17,9 @@ If you have connected an Ethernet cable to your F2 carrier board, it will typica
 
 2. *Verify IP Address:* Open a terminal on your Jetson Orin and use the ~ip addr~ or ~ifconfig~ command to check if an IP address has been assigned to the Ethernet interface (usually ~eth2~).
    #+BEGIN_SRC sh
-   ip addr show eth2
-   # OR
-   ifconfig eth2
+     ip addr show eth2
+     # OR
+     ifconfig eth2
    #+END_SRC
    Look for an ~inet~ address within the output. If you see an IP address starting with ~192.168.~, it likely means DHCP has successfully assigned an IP address.
 
@@ -128,7 +128,7 @@ This section outlines the steps to configure a Quectel RM520N-GL 5G card connect
      lsusb -t
    #+END_SRC
 
-4. *Get IP Address:* After successfully connecting, the 5G interface (likely `wwan0` or similar) should receive an IP address. Check using `ip addr`.
+4. *Get IP Address:* After successfully connecting, the 5G interface (likely ~wwan0~ or similar) should receive an IP address. Check using ~ip addr~.
 
    #+BEGIN_SRC sh
      ip addr show wwan0
@@ -136,7 +136,7 @@ This section outlines the steps to configure a Quectel RM520N-GL 5G card connect
      ifconfig wwan0
    #+END_SRC
 
-5. *Check Logs:* You can monitor the logs for the `qmi_wwan` setup for any errors.
+5. *Check Logs:* You can monitor the logs for the ~qmi_wwan~ setup for any errors.
 
    #+BEGIN_SRC sh
      tail -f /var/log/qmi_wwan_setup.log
@@ -152,7 +152,7 @@ This section outlines the steps to configure a Quectel RM520N-GL 5G card connect
 
 * Verifying Network Connectivity
 
-Once you have configured your network connection (wired, wireless, or 5G), you can verify connectivity using the `ping` command.
+Once you have configured your network connection (wired, wireless, or 5G), you can verify connectivity using the ~ping~ command.
 
 1. *Ping an External Host:* Try pinging a well-known website or IP address (e.g., Google's DNS server at ~8.8.8.8~).
 
