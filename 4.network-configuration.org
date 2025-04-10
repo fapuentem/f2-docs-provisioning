@@ -1,0 +1,137 @@
+#+TITLE: 4. Network Configuration
+#+AUTHOR: Visiontech Consulting Inc.
+#+DATE: <2025-04-10 Thu>
+#+OPTIONS: toc:nil num:nil
+
+This section describes how to configure network connectivity on your Jetson Orin F2 carrier board, including wired Ethernet, optional Wi-Fi, and configuration for a Quectel RM520N-GL 5G card.
+
+* Wired Network Configuration
+
+If you have connected an Ethernet cable to your F2 carrier board, it will typically attempt to obtain an IP address automatically using DHCP.
+
+*DHCP Configuration:*
+
+1. *Check Connection:* Ensure the Ethernet cable is securely connected to both the carrier board and your network infrastructure (router, switch, etc.).
+2. *Verify IP Address:* Open a terminal on your Jetson Orin and use the ~ip addr~ or ~ifconfig~ command to check if an IP address has been assigned to the Ethernet interface (usually ~eth2~).
+   #+BEGIN_SRC sh
+   ip addr show eth2
+   # OR
+   ifconfig eth2
+   #+END_SRC
+   Look for an ~inet~ address within the output. If you see an IP address starting with ~192.168.~, it likely means DHCP has successfully assigned an IP address.
+
+
+* Wireless Network Configuration
+
+F2 carrier board has Wi-Fi capabilities, you can connect to a wireless network.
+
+*Scanning for Available Networks:*
+
+1. *Enable Wi-Fi (if necessary):* Use the network management tools to ensure Wi-Fi is enabled.
+   #+BEGIN_SRC sh
+     sudo nmtui
+   #+END_SRC
+   [[./images/nmtui-network.png]]
+ 2. *Scan for Networks:*
+   This will display a list of available Wi-Fi networks (SSIDs).
+   [[./images/nmtui-wifi-networks.png]]
+
+*Connecting to a Network using ~wpa_supplicant~:*
+
+You can use the ~wpa_supplicant~ tool to connect to a Wi-Fi network from the command line.
+
+1. *Configure ~wpa_supplicant.conf~:* You might need to create or edit the ~/etc/wpa_supplicant/wpa_supplicant.conf~ file.
+   #+BEGIN_SRC sh
+     sudo nano /etc/wpa_supplicant.conf
+   #+END_SRC
+   Add the following lines, replacing the placeholders with your network's SSID and password:
+   #+BEGIN_SRC conf
+     network={
+         ssid="your_network_ssid"
+         psk="your_wifi_password"
+     }
+   #+END_SRC
+2. *Connect to Network:* Use the ~wpa_supplicant~ command to connect to the network. Replace ~wlan0~ with your Wi-Fi interface name.
+   #+BEGIN_SRC sh
+     sudo wpa_supplicant -i wlan0 -c /etc/wpa_supplicant.conf -B
+   #+END_SRC
+3. *Obtain IP Address:* Use ~dhclient~ to obtain an IP address from the Wi-Fi network.
+   #+BEGIN_SRC sh
+     sudo dhclient wlan0
+   #+END_SRC
+4. *Verify Connection:* Use ~ip addr show wlan0~ to check if an IP address has been assigned.
+
+* Configuring Quectel RM520N-GL 5G Card
+
+This section outlines the steps to configure a Quectel RM520N-GL 5G card connected to your F2 carrier board. This assumes the card is connected via a USB interface.
+
+1. *Install ~qmi_wwan~ Driver:*
+   - *Check if Driver Exists:* First, check if the ~qmi_wwan~ driver is already available on your system.
+     #+BEGIN_SRC sh
+       modinfo qmi_wwan
+     #+END_SRC
+     If you see information about the driver, you can likely skip the manual installation.
+   - *Manual Installation (if needed):* If the driver is not found, you might need to build it from source or obtain a pre-built kernel module. We already build it, and you can find th ~qmi_wwan.ko~ file in,
+     #+BEGIN_SRC
+       cd tools
+       git clone https://github.com/fapuentem/f2-maintenance-tools.git
+     #+END_SRC
+     You can try loading it.
+     #+BEGIN_SRC sh
+       modinfo ~/tools/f2-maintenance-tools/qmi_wwan.ko | more
+       sudo cp qmi_wwan.ko /lib/modules/5.10.120-tegra/kernel/drivers/net/
+       sudo depmod
+       sudo modprobe qmi_wwan
+     #+END_SRC
+     - *Verify Driver Loaded:*
+       #+BEGIN_SRC sh
+         ls -lash /dev/cdc-wdm0
+       #+END_SRC
+       If the driver is loaded successfully, you should see a device file like ~/dev/cdc-wdm0~.
+
+2. *Configure QMI Connection:* You will use the ~qmicli~ tool to configure the data connection. Ensure ~libqmi-utils~ is installed (which was included in the essential software installation).
+     #+BEGIN_SRC sh
+       sudo cp tools/f2-maintenance-tools/qmi_wwan_setup /etc/init.d/
+       sudo chmod +x /etc/init.d/qmi_wwan_setup
+       sudo update-rc.d qmi_wwan_setup defaults
+       sudo reboot
+     #+END_SRC
+
+3. *Check USB Devices:* You can use ~lsusb -t~ to see the USB device tree and verify the Quectel module is recognized.
+   #+BEGIN_SRC sh
+     lsusb -t
+   #+END_SRC
+
+4. *Get IP Address:* After successfully connecting, the 5G interface (likely `wwan0` or similar) should receive an IP address. Check using `ip addr`.
+   #+BEGIN_SRC sh
+     ip addr show wwan0
+     # OR
+     ifconfig wwan0
+   #+END_SRC
+
+5. *Check Logs:* You can monitor the logs for the `qmi_wwan` setup for any errors.
+   #+BEGIN_SRC sh
+     tail -f /var/log/qmi_wwan_setup.log
+   #+END_SRC
+
+6. *Alternative Connection Method (using ~quectel-CM~):* If you have this tool installed, you can try connecting using:
+   #+BEGIN_SRC sh
+     sudo /home/nvidia/quectel-CM/quectel-CM -s internet.swir -f /var/log/quectel-CM.log
+   #+END_SRC
+   Adjust the path to ~quectel-CM~ and the APN (~internet.swir~) as needed.
+
+* Verifying Network Connectivity
+
+Once you have configured your network connection (wired, wireless, or 5G), you can verify connectivity using the `ping` command.
+
+1. *Ping an External Host:* Try pinging a well-known website or IP address (e.g., Google's DNS server at ~8.8.8.8~).
+   #+BEGIN_SRC sh
+     ping -I wwan0 -c 4 8.8.8.8
+   #+END_SRC
+   If you receive replies, your network connection is likely working.
+2. *Ping Your Router/Gateway:* Ping the IP address of your router or gateway to verify connectivity within your local network.
+   #+BEGIN_SRC sh
+     ping -c 4 your_router_ip_address
+   #+END_SRC
+
+Remember to replace placeholders like interface names (~eth0~, ~wlan0~, ~wwan0~), APNs, IP addresses, and file paths with the actual values relevant to your setup. Consult the documentation for your F2 carrier board and the Quectel RM520N-GL module for more specific information.
