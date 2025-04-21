@@ -1,0 +1,77 @@
+#+TITLE: 5. Software Installation
+#+AUTHOR: Visiontech Consulting Inc.
+#+DATE: <2025-04-21 Mon>
+#+OPTIONS: toc:nil num:nil
+
+This section details the installation of essential software packages, libraries, and development tools on your Jetson Orin module running on the F2 carrier board. While the core NVIDIA drivers and libraries are installed during the initial flashing process, this section covers additional useful software and how to verify your NVIDIA installation.
+
+* Updating Package Lists
+
+It's important to update your system's package lists to ensure you can install the latest versions of software available in the repositories.
+
+#+BEGIN_SRC sh
+sudo apt update
+#+END_SRC
+
+* Installing Essential Packages
+
+Install a set of common and useful packages for development and system monitoring.
+
+#+BEGIN_SRC sh
+sudo apt-get install git curl python3-pip stm32flash jq libqmi-utils udhcpc htop sysstat python3.8-venv -y
+#+END_SRC
+
+- =git=: Version control system.
+- =curl=: Tool for transferring data with URLs.
+- =python3-pip=: Package installer for Python 3.
+- =stm32flash=: Utility for flashing STM32 microcontrollers.
+- =jq=: Command-line JSON processor.
+- =libqmi-utils=: Utilities for communicating with WWAN modems using the QMI protocol (useful for 5G modem like the Quectel RM520N-GL).
+- =udhcpc=: A small DHCP client.
+- =htop=: Interactive process viewer.
+- =sysstat=: Utilities for performance monitoring.
+- =python3.8-venv=: Creates lightweight virtual environments for Python.
+
+* Installing jetson-stats and emacs
+
+*(Note: These packages were also included in the [[file:3.first-boot-configuration.org][First Boot Configuration]] section. If you installed them there, you can skip these steps.)*
+
+- *jetson-stats:* A package to monitor and control your Jetson.
+  #+BEGIN_SRC sh
+  sudo pip3 install -U jetson-stats
+  #+END_SRC
+  After installation, you can run ~jtop~ in the terminal to view system status.
+
+- *emacs:* Install the Emacs text editor using Snap.
+  #+BEGIN_SRC sh
+  sudo snap install emacs --classic --beta
+  #+END_SRC
+
+* Verifying NVIDIA Drivers and Libraries
+
+The core NVIDIA drivers, CUDA, cuDNN, TensorRT, and other JetPack components are primarily installed during the initial flashing process using SDK Manager. However, you can verify their status and versions after the system is set up.
+
+- *Check Installed NVIDIA Packages:*
+  Use ~dpkg~ to list installed packages and filter for those related to nvidia.
+  #+BEGIN_SRC sh
+  dpkg -l | grep nvidia
+  #+END_SRC
+  This will show you a list of NVIDIA-related packages and their installed versions.
+
+- *Check CUDA Version:*
+  If CUDA was installed (which it is by default with JetPack), you can check its version using the ~nvcc~ compiler.
+  #+BEGIN_SRC sh
+  nvcc --version
+  #+END_SRC
+  *(Note: If =nvcc= is not found, it might indicate an issue with the CUDA installation or environment path.)*
+
+- *Monitor Jetson Status with tegrastats:*
+  The ~tegrastats~ utility provides real-time monitoring of the Jetson's CPU, GPU, power consumption, and other parameters. This implicitly verifies that the basic NVIDIA components are functioning.
+  #+BEGIN_SRC sh
+  tegrastats
+  #+END_SRC
+  Press ~Ctrl+C~ to exit the ~tegrastats~ monitor.
+
+If any of the core NVIDIA components appear to be missing or not functioning correctly after verification, you might need to re-run SDK Manager and ensure the relevant components were selected during the flashing process.
+
+This completes the installation of essential software. You are now ready to  proceed with further development environment setup.

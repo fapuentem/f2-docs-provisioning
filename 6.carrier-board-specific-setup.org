@@ -1,0 +1,84 @@
+#+TITLE: 6. Carrier Board Specific Setup (F2)
+#+AUTHOR: Visiontech Consulting Inc.
+#+DATE: <2025-04-21 Mon>
+#+OPTIONS: toc:nil num:nil
+
+
+This section covers configuration steps specifically required for the F2 custom carrier board to ensure all its features and peripherals function correctly with the Jetson Orin module.
+
+* Device Tree Configuration
+
+The Device Tree Blob (DTB) file contains critical information about the hardware connected to the Jetson module on the carrier board. Your F2 carrier board requires a specific DTB file to correctly recognize and configure its peripherals, such as the serial port.
+
+1.  *Obtain the Custom F2 DTB File:*
+    You need to obtain the custom DTB file tailored for the F2 carrier board. The file name is typically ~kernel_tegra234-p3767-0001-p3768-0000-a0-bt40ne.dtb~.
+    - *Download the file:* Download the file from the provided source ([https://drive.google.com/file/d/15gpHljZiRCQFr786_SCpoW1DkV007QhS/view?usp=drive_link]).
+    - Save the file to a convenient location on your Jetson Orin, for example, in your home directory or a dedicated folder.
+
+2.  *Identify the Current DTB File:*
+    The system's bootloader (~extlinux.conf~) specifies which DTB file is loaded during boot. You can inspect this file to see the currently used DTB.
+    #+BEGIN_SRC sh
+      more /boot/extlinux/extlinux.conf
+    #+END_SRC
+    Look for a line similar to ~FDT /boot/dtb/kernel_tegra234-p3767-0001-p3768-0000-a0.dtb~. This shows the default DTB file being used.
+
+3.  *Back Up the Original DTB File (Recommended):*
+    Before replacing the original DTB file, it is strongly recommended to create a backup. This allows you to easily revert if the custom DTB causes issues.
+    #+BEGIN_SRC sh
+      sudo cp /boot/dtb/kernel_tegra234-p3767-0001-p3768-0000-a0.dtb /boot/dtb/kernel_tegra234-p3767-0001-p3768-0000-a0.dtb.bak
+    #+END_SRC
+    Ensure the original filename matches the one from your ~extlinux.conf~.
+
+4.  *Copy the Custom F2 DTB File:*
+    Copy the downloaded custom F2 DTB file to the ~/boot/dtb/~ directory, overwriting the original file. Use ~sudo~ as this requires root privileges.
+    #+BEGIN_SRC sh
+      sudo cp /path/to/your/downloaded/kernel_tegra234-p3767-0001-p3768-0000-a0-bt40ne.dtb /boot/dtb/kernel_tegra234-p3767-0001-p3768-0000-a0.dtb
+    #+END_SRC
+    Replace ~/path/to/your/downloaded/~ with the actual path where you saved the downloaded ~.dtb~ file. Note that you are copying the custom file and renaming it to match the original DTB file name referenced in ~extlinux.conf~.
+
+5.  *Reboot the System:*
+    For the new DTB file to be loaded and applied by the kernel, you must reboot the Jetson Orin.
+    #+BEGIN_SRC sh
+      sudo reboot
+    #+END_SRC
+
+* Driver Installation for Carrier Board Peripherals
+
+*(If your F2 carrier board requires specific kernel modules or drivers for unique peripherals that are not enabled solely by the Device Tree, document their installation process here. This might involve building drivers from source or installing pre-compiled modules.)*
+
+*(Example Placeholder: If your board has a specific sensor requiring a kernel driver not included in JetPack.)*
+- **Installing the [Sensor Name] Driver:**
+  *(Provide step-by-step instructions, including downloading the driver source or package, compiling if necessary, and loading the module.)*
+
+* Configuration Files
+
+*(If the F2 carrier board's functionality requires modifications to specific system configuration files outside of the Device Tree, document those changes here.)*
+
+*(Example Placeholder: If a service needs to be configured to interact with a specific piece of hardware on the F2 board.)*
+- **Configuring the [Service Name] Service:**
+  *(Provide instructions on which configuration file to edit and what changes to make.)*
+
+* Testing Carrier Board Specific Features
+
+After applying the carrier board-specific configurations, it's important to test the unique features of your F2 board to ensure they are working correctly.
+
+- *Testing the Serial Port:*
+  Since you updated the DTB to enable the serial port, verify that it is accessible.
+  1.  Identify the serial port device node (commonly ~/dev/ttyTHS1~). You might find this information by inspecting the kernel logs (~dmesg~).
+  2.  You can test the serial port by connecting another device (like a host computer with a serial terminal) and using a terminal program (like ~screen~ or ~minicom~) on the Jetson to send and receive data.
+      #+BEGIN_SRC sh
+        sudo apt-get install minicom
+        minicom -D /dev/ttyTHS1 -b 115200 # Replace /dev/ttyTHS0 and baudrate if needed
+      #+END_SRC
+      Press ~Ctrl+A Z~ to access the minicom command menu, then ~X~ to exit.
+  3.  Alternatively, check the kernel logs for messages related to the serial port device after booting.
+      #+BEGIN_SRC sh
+        dmesg | grep tty
+      #+END_SRC
+
+- *Testing Other F2 Specific Peripherals:*
+  *(Add steps here to test any other unique hardware on your F2 carrier board that you have configured, e.g., GPIOs, I2C devices, cameras, displays.)*
+  -   *(Example: Testing GPIOs using sysfs or a library like Jetson.GPIO.)*
+  -   *(Example: Capturing an image from a camera connected to the F2 board.)*
+
+Successfully testing these features confirms that your F2 carrier board is properly configured.

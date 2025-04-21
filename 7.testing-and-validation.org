@@ -1,0 +1,116 @@
+#+TITLE: 7. Testing and Validation
+#+AUTHOR: Visiontech Consulting Inc.
+#+DATE: <2025-04-09 Wed>
+#+OPTIONS: toc:nil num:nil
+
+After completing the provisioning process, it's crucial to perform various tests to validate that the Jetson Orin module and the F2 carrier board are functioning correctly and that all necessary software is installed and accessible.
+
+* Basic System Checks
+
+Verify the fundamental aspects of the operating system and hardware to ensure the flash and initial setup were successful.
+
+- *Verify Operating System Version:*
+  Check the installed Ubuntu version.
+  #+BEGIN_SRC sh
+    lsb_release -a
+    # OR
+    cat /etc/os-release
+  #+END_SRC
+  Confirm that the version matches what you intended to flash.
+
+- *Verify Kernel Version:*
+  Check the Linux kernel version.
+  #+BEGIN_SRC sh
+    uname -a
+  #+END_SRC
+  This shows the kernel version and architecture.
+
+- *Verify JetPack/L4T Version:*
+  Check the NVIDIA JetPack (or L4T - Linux for Tegra) version, which is the software stack for the Jetson.
+  #+BEGIN_SRC sh
+    cat /etc/nv_tegra_release
+  #+END_SRC
+  This file contains information about the L4T release installed.
+
+- *Check Hardware Information:*
+  Use various tools to inspect recognized hardware components.
+  #+BEGIN_SRC sh
+    lscpu       # Shows CPU information
+    lsusb       # Lists USB devices
+    lspci       # Lists PCI devices
+  #+END_SRC
+  Verify that expected devices (like the Quectel 5G modem if connected via USB, or other PCIe devices on the F2 board) are listed.
+
+- *Quick System Overview with jtop:*
+  Since you installed ~jetson-stats~, you can use ~jtop~ for a dynamic overview of system resource usage (CPU, GPU, RAM, storage, etc.).
+  #+BEGIN_SRC sh
+    jtop
+  #+END_SRC
+  Press ~q~ to exit ~jtop~.
+
+* Network Connectivity Tests
+
+Re-verify that all configured network interfaces (wired, wireless, 5G) have active connections and can reach external networks. Refer back to [[file:4.network-configuration.org][Network Configuration]] for setup details if needed.
+
+- *Check IP Addresses:*
+  Confirm that your network interfaces (`eth0`, `wlan0`, `wwan0` for 5G) have been assigned IP addresses.
+  #+BEGIN_SRC sh
+    ip addr
+  #+END_SRC
+
+- *Ping External Hosts:*
+  Test connectivity to the internet by pinging a reliable external server.
+  #+BEGIN_SRC sh
+    ping -c 4 -I wwan0 8.8.8.8   # Ping Google's DNS server
+    ping -c 4 google.com # Ping a domain name (also tests DNS resolution)
+  #+END_SRC
+  Successful replies indicate that your network connection is working.
+
+* Performance Benchmarks (Optional)
+
+If performance is a critical aspect of your application, you can run basic benchmarks to get an idea of the system's capabilities.
+
+- *System Resource Monitoring:*
+  Use ~htop~ to monitor CPU and memory usage in real-time.
+  #+BEGIN_SRC sh
+    htop
+  #+END_SRC
+  Use ~tegrastats~ for detailed monitoring of Jetson-specific metrics like GPU usage, power, and temperature.
+  #+BEGIN_SRC sh
+    tegrastats
+  #+END_SRC
+
+- *Specific Benchmarks:*
+  *(If you have specific performance requirements, describe how to run relevant benchmarks here. This could include CUDA benchmarks, deep learning inference tests using TensorRT, multimedia encoding/decoding performance tests, etc.)*
+  -   *(Example: Running a simple CUDA example from the NVIDIA samples.)*
+  -   *(Example: Running a gstreamer pipeline for video encoding/decoding.)*
+
+* Testing Key Functionalities
+
+Verify the core capabilities of the Jetson Orin module and the specific features of your F2 carrier board.
+
+- *GPU Functionality:*
+  Confirm that the GPU is recognized and functional.
+  -   Use ~tegrastats~ or ~jtop~ to observe GPU activity when running a GPU-accelerated task.
+  -   If CUDA is installed, running a simple CUDA example from the CUDA toolkit samples is a good test. Navigate to the samples directory (often `~/cuda-samples/`) and try compiling and running a basic example like `vectorAdd`.
+      #+BEGIN_SRC sh
+        # Example steps (adjust path as needed)
+        # cd ~/cuda-samples/Samples/0_Introduction/vectorAdd
+        # make
+        # ./vectorAdd
+      #+END_SRC
+
+- *Multimedia Capabilities:*
+  Test hardware accelerated video encoding and decoding. You can use tools like ~gst-launch-1.0~ with NVIDIA plugins.
+  #+BEGIN_SRC sh
+    # Example: Play a test video using nvdec
+    gst-launch-1.0 filesrc location=/path/to/your/video.mp4 ! qtdemux ! h264parse ! nvv4l2decoder ! nv3comp ! xvimagesink
+  #+END_SRC
+  Replace ~/path/to/your/video.mp4~ with an actual video file path. You might need to install gstreamer good/bad/ugly plugins (~sudo apt install gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly~).
+
+- *Carrier Board Specific Features (F2):*
+  As covered in [[file:6.carrier-board-specific-setup.org][Carrier Board Specific Setup (F2)]], ensure that the unique peripherals on your F2 board are working.
+  - *Serial Port:* Verify communication through the serial port you configured with the custom DTB.
+  - *Other Peripherals:* Test any other specific hardware on your F2 board (cameras, sensors, GPIOs, etc.) following the testing steps outlined in the previous section or the F2 carrier board documentation.
+
+Successful completion of these tests indicates that your Jetson Orin on the F2 carrier board is provisioned correctly and the essential functionalities are operational.
