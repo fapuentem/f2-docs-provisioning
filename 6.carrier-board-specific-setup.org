@@ -47,7 +47,7 @@ The Device Tree Blob (DTB) file contains critical information about the hardware
 *(If your F2 carrier board requires specific kernel modules or drivers for unique peripherals that are not enabled solely by the Device Tree, document their installation process here. This might involve building drivers from source or installing pre-compiled modules.)*
 
 *(Example Placeholder: If your board has a specific sensor requiring a kernel driver not included in JetPack.)*
-- **Installing the [Sensor Name] Driver:**
+- *Installing the [Sensor Name] Driver:*
   *(Provide step-by-step instructions, including downloading the driver source or package, compiling if necessary, and loading the module.)*
 
 * Configuration Files
@@ -55,7 +55,7 @@ The Device Tree Blob (DTB) file contains critical information about the hardware
 *(If the F2 carrier board's functionality requires modifications to specific system configuration files outside of the Device Tree, document those changes here.)*
 
 *(Example Placeholder: If a service needs to be configured to interact with a specific piece of hardware on the F2 board.)*
-- **Configuring the [Service Name] Service:**
+- *Configuring the [Service Name] Service:*
   *(Provide instructions on which configuration file to edit and what changes to make.)*
 
 * Testing Carrier Board Specific Features

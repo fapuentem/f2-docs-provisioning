@@ -37,7 +37,9 @@ Before starting the flashing process, ensure the following:
 * Flashing Procedure (using SDK Manager)
 
 1. *Select Components:* In the "Details and License" step, you will see various options for SDK components.
+   
    - For a basic flash, ensure that the *Jetson Linux* and *Jetson Runtime* are selected. You can deselect other components like CUDA, cuDNN, TensorRT, etc., if you only want to flash the base operating system initially. You can install these later if needed.
+     
    - Carefully review the selected components and their versions.
 2. *Review Licenses:* Accept the necessary licenses by checking the "I accept the terms and conditions" boxes.
    [[./images/sdkmanager-step2.png]]
@@ -45,12 +47,19 @@ Before starting the flashing process, ensure the following:
    In the "Recovery mode setup" choose "Manual Setup", and in item 8 use a default password *nvidia* and user *nvidia*.
    [[./images/recovery-preconfig.png]]
 4. *Put Jetson Orin into Force Recovery Mode:* SDK Manager will guide you through the steps to put your Jetson Orin module into Force Recovery Mode. This typically involves the following sequence:
+
    a. *Ensure the F2 carrier board is powered OFF.*
+   
    b. *Connect the USB cable* from your host computer to the designated USB port on the F2 carrier board (refer to your carrier board's documentation for the correct port (RECOVERY connector), often a USB Type-C or Micro-USB port labeled for flashing).
+   
    c. *Press and hold the Recovery Button* on the F2 carrier board.
+   
    d. *While still holding the Recovery Button, briefly press and release the Power Button* on the F2 carrier board.
+   
    e. *Release the Recovery Button.*
+   
    f. *Power ON the F2 carrier board* (if it didn't power on automatically).
+   
 5. *SDK Manager Detection:* SDK Manager should now detect your Jetson Orin module in Force Recovery Mode. If it doesn't, refer to the [[file:2.jetson-orin-flash.org::*Troubleshooting Flashing Issues][Troubleshooting Flashing Issues]] section.
 6. *Flashing Begins:* Once the module is detected, SDK Manager will automatically start downloading the necessary files and flashing the operating system onto the Jetson Orin module. This process can take a significant amount of time depending on your internet speed and system resources.
 7. *Monitor the Progress:* Keep an eye on the SDK Manager window for progress updates and any error messages.
