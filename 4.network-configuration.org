@@ -113,43 +113,40 @@ This section outlines the steps to configure a Quectel RM520N-GL 5G card connect
 
        If the driver is loaded successfully, you should see a device file like ~/dev/cdc-wdm0~.
 
-2. *Configure QMI Connection:* You will use the ~qmicli~ tool to configure the data connection. Ensure ~libqmi-utils~ is installed (which was included in the essential software installation).
+2. *Configure QMI Connection:* (using ~quectel-CM~):
+   Source: [[https://www.embeddedpi.com/documentation/3g-4g-modems/quectel-connection-manager-quectel-cm-lte-ec25][Quectel Modem Connection Manager]]
+   + Install missing package
+     #+BEGIN_SRC sh
+       sudo apt install dhcpcd5
 
-   #+BEGIN_SRC sh
-     sudo cp tools/f2-maintenance-tools/qmi_wwan_setup /etc/init.d/
-     sudo chmod +x /etc/init.d/qmi_wwan_setup
-     sudo update-rc.d qmi_wwan_setup defaults
-     sudo reboot
-   #+END_SRC
+       # Enable and start service
+       sudo systemctl enable dhcpcd
+       sudo systemctl start dhcpcd
+     #+END_SRC
 
-3. *Check USB Devices:* You can use ~lsusb -t~ to see the USB device tree and verify the Quectel module is recognized.
+   + Download the tar package
+     #+BEGIN_SRC sh
+       cd ~/Downloads
+       wget https://github.com/mypiandrew/quectel-cm/releases/download/V1.6.0.12/quectel-CM.tar.gz
+       tar xvf quectel-CM.tar.gz
+     #+END_SRC
 
-   #+BEGIN_SRC sh
-     lsusb -t
-   #+END_SRC
+   + Inside the ~quectel-CM~ directory,  we find bash scripts like ~install.sh~ and ~default.script~.
 
-4. *Get IP Address:* After successfully connecting, the 5G interface (likely ~wwan0~ or similar) should receive an IP address. Check using ~ip addr~.
+   + Change ~metric~ variable in line 20 in ~default.script~.
 
-   #+BEGIN_SRC sh
-     ip addr show wwan0
-     # OR
-     ifconfig wwan0
-   #+END_SRC
+   + Change ~UDHCPC_DIR~ should be ~/etc/udhcpc/~. And run ~install.sh~ as sudo.
 
-5. *Check Logs:* You can monitor the logs for the ~qmi_wwan~ setup for any errors.
+   + Test connection using:
+     #+BEGIN_SRC sh
+       quectel-CM -s internet.swir -f /var/log/quectel-CM.log
+     #+END_SRC
 
-   #+BEGIN_SRC sh
-     tail -f /var/log/qmi_wwan_setup.log
-   #+END_SRC
-
-6. *Alternative Connection Method (using ~quectel-CM~):* If you have this tool installed, you can try connecting using:
-
-   #+BEGIN_SRC sh
-     sudo /home/nvidia/quectel-CM/quectel-CM -s internet.swir -f /var/log/quectel-CM.log
-   #+END_SRC
-
-   Adjust the path to ~quectel-CM~ and the APN (~internet.swir~) as needed.
-
+   + Check status of the modem
+     #+BEGIN_SRC sh
+       mmcli -L
+       mmcli -m x # x depends on the command above.
+     #+END_SRC
 * Verifying Network Connectivity
 
 Once you have configured your network connection (wired, wireless, or 5G), you can verify connectivity using the ~ping~ command.
