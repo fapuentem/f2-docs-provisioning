@@ -41,6 +41,9 @@ Before starting the flashing process, ensure the following:
    - For a basic flash, ensure that the *Jetson Linux* and *Jetson Runtime* are selected. You can deselect other components like CUDA, cuDNN, TensorRT, etc., if you only want to flash the base operating system initially. You can install these later if needed.
      
    - Carefully review the selected components and their versions.
+
+   -  [[https://docs.nvidia.com/jetson/archives/r35.3.1/DeveloperGuide/text/HR/JetsonModuleAdaptationAndBringUp/JetsonOrinNxNanoSeries.html#eeprom-modifications][EPROM modifications]].
+     
 2. *Review Licenses:* Accept the necessary licenses by checking the "I accept the terms and conditions" boxes.
    [[./images/sdkmanager-step2.png]]
 3. *Initiate Flashing:* Click on the "Continue" button to begin the download and flashing process.
