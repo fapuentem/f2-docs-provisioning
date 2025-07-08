@@ -30,6 +30,11 @@ F2 carrier board has Wi-Fi capabilities, you can connect to a wireless network.
 
 *Scanning for Available Networks:*
 
+#+BEGIN_COMMENT
+Wi-Fi cards AX210 requieres of a small trick:
+sudo mv /lib/firmware/iwlwifi-ty-a0-gf-a0.pnvm /lib/firmware/iwlwifi-ty-a0-gf-a0.pnvm.bck
+#+END_COMMENT
+
 1. *Enable Wi-Fi (if necessary):* Use the network management tools to ensure Wi-Fi is enabled.
 
    #+BEGIN_SRC sh
