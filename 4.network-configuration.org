@@ -3,30 +3,41 @@
 #+DATE: <2025-04-10 Thu>
 #+OPTIONS: toc:nil num:nil
 
-This section describes how to configure network connectivity on your Jetson Orin F2 carrier board, including wired Ethernet, optional Wi-Fi, and configuration for a Quectel RM520N-GL 5G card.
+This section describes how to configure network connectivity on your
+Jetson Orin F2 carrier board, including wired Ethernet, optional
+Wi-Fi, and configuration for a Quectel RM520N-GL 5G card.
 
 * Wired Network Configuration
 
-If you have connected an Ethernet cable to your F2 carrier board, it will typically attempt to obtain an IP address automatically using DHCP.
+If you have connected an Ethernet cable to your F2 carrier board, it
+will typically attempt to obtain an IP address automatically using
+DHCP.
 
 *DHCP Configuration:*
 
-1. *Check Connection:* Ensure the Ethernet cable is securely connected to both the carrier board(/ETHERNET(Main)/ connector) and your network infrastructure (router, switch, etc.).
+1. *Check Connection:* Ensure the Ethernet cable is securely connected
+   to both the carrier board(/ETHERNET(Main)/ connector) and your
+   network infrastructure (router, switch, etc.).
 
    [[./images/ethernet-connector.png]]
 
-2. *Verify IP Address:* Open a terminal on your Jetson Orin and use the ~ip addr~ or ~ifconfig~ command to check if an IP address has been assigned to the Ethernet interface (usually ~eth2~).
+2. *Verify IP Address:* Open a terminal on your Jetson Orin and use the
+   ~ip addr~ or ~ifconfig~ command to check if an IP address has been
+   assigned to the Ethernet interface (usually ~eth2~).
    #+BEGIN_SRC sh
      ip addr show eth2
      # OR
      ifconfig eth2
    #+END_SRC
-   Look for an ~inet~ address within the output. If you see an IP address starting with ~192.168.~, it likely means DHCP has successfully assigned an IP address.
+   Look for an ~inet~ address within the output. If you see an IP
+   address starting with ~192.168.~, it likely means DHCP has
+   successfully assigned an IP address.
 
 
 * Wireless Network Configuration
 
-F2 carrier board has Wi-Fi capabilities, you can connect to a wireless network.
+F2 carrier board has Wi-Fi capabilities, you can connect to a wireless
+network.
 
 *Scanning for Available Networks:*
 
@@ -35,7 +46,8 @@ Wi-Fi cards AX210 requieres of a small trick:
 sudo mv /lib/firmware/iwlwifi-ty-a0-gf-a0.pnvm /lib/firmware/iwlwifi-ty-a0-gf-a0.pnvm.bck
 #+END_COMMENT
 
-1. *Enable Wi-Fi (if necessary):* Use the network management tools to ensure Wi-Fi is enabled.
+1. *Enable Wi-Fi (if necessary):* Use the network management tools to
+   ensure Wi-Fi is enabled.
 
    #+BEGIN_SRC sh
      sudo nmtui
@@ -43,7 +55,7 @@ sudo mv /lib/firmware/iwlwifi-ty-a0-gf-a0.pnvm /lib/firmware/iwlwifi-ty-a0-gf-a0
 
    [[./images/nmtui-network.png]]
 
- 2. *Scan for Networks:*
+2. *Scan for Networks:*
 
    This will display a list of available Wi-Fi networks (SSIDs).
 
@@ -51,50 +63,64 @@ sudo mv /lib/firmware/iwlwifi-ty-a0-gf-a0.pnvm /lib/firmware/iwlwifi-ty-a0-gf-a0
 
 *Connecting to a Network using ~wpa_supplicant~:*
 
-You can use the ~wpa_supplicant~ tool to connect to a Wi-Fi network from the command line.
+You can use the ~wpa_supplicant~ tool to connect to a Wi-Fi network from
+the command line.
 
-1. *Configure ~wpa_supplicant.conf~:* You might need to create or edit the ~/etc/wpa_supplicant/wpa_supplicant.conf~ file.
+1. *Configure ~wpa_supplicant.conf~:* You might need to create or edit the
+   ~/etc/wpa_supplicant/wpa_supplicant.conf~ file.
 
    #+BEGIN_SRC sh
      sudo nano /etc/wpa_supplicant.conf
    #+END_SRC
-   Add the following lines, replacing the placeholders with your network's SSID and password:
 
-   #+BEGIN_SRC conf
+   Add the following lines, replacing the placeholders with your
+   network's SSID and password:
+
+   #+BEGIN_SRC conf :dir /etc/wpa_supplicant.conf
      network={
          ssid="your_network_ssid"
          psk="your_wifi_password"
      }
    #+END_SRC
 
-2. *Connect to Network:* Use the ~wpa_supplicant~ command to connect to the network. Replace ~wlan0~ with your Wi-Fi interface name.
+2. *Connect to Network:* Use the ~wpa_supplicant~ command to connect to
+   the network. Replace ~wlan0~ with your Wi-Fi interface name.
 
    #+BEGIN_SRC sh
      sudo wpa_supplicant -i wlan0 -c /etc/wpa_supplicant.conf -B
    #+END_SRC
 
-3. *Obtain IP Address:* Use ~dhclient~ to obtain an IP address from the Wi-Fi network.
+3. *Obtain IP Address:* Use ~dhclient~ to obtain an IP address from the
+   Wi-Fi network.
 
    #+BEGIN_SRC sh
      sudo dhclient wlan0
    #+END_SRC
 
-4. *Verify Connection:* Use ~ip addr show wlan0~ to check if an IP address has been assigned.
+4. *Verify Connection:* Use ~ip addr show wlan0~ to check if an IP address
+   has been assigned.
 
 * Configuring Quectel RM520N-GL 5G Card
 
-This section outlines the steps to configure a Quectel RM520N-GL 5G card connected to your F2 carrier board. This assumes the card is connected via a USB interface.
+This section outlines the steps to configure a Quectel RM520N-GL 5G
+card connected to your F2 carrier board. This assumes the card is
+connected via a USB interface.
 
 1. *Install ~qmi_wwan~ Driver:*
-   - *Check if Driver Exists:* First, check if the ~qmi_wwan~ driver is already available on your system.
+   - *Check if Driver Exists:* First, check if the ~qmi_wwan~ driver is
+     already available on your system.
 
      #+BEGIN_SRC sh
        modinfo qmi_wwan
      #+END_SRC
 
-     If you see information about the driver, you can likely skip the manual installation.
+     If you see information about the driver, you can likely skip the
+     manual installation.
 
-   - *Manual Installation (if needed):* If the driver is not found, you might need to build it from source or obtain a pre-built kernel module. We already build it, and you can find th ~qmi_wwan.ko~ file in,
+   - *Manual Installation (if needed):* If the driver is not found, you
+     might need to build it from source or obtain a pre-built kernel
+     module. We already build it, and you can find th ~qmi_wwan.ko~ file
+     in,
 
      #+BEGIN_SRC
        cd tools
@@ -105,6 +131,9 @@ This section outlines the steps to configure a Quectel RM520N-GL 5G card connect
 
      #+BEGIN_SRC sh
        modinfo ~/tools/f2-maintenance-tools/qmi_wwan.ko | more
+     #+END_SRC
+
+     #+BEGIN_SRC sh :dir /sudo::
        sudo cp qmi_wwan.ko /lib/modules/5.10.120-tegra/kernel/drivers/net/
        sudo depmod
        sudo modprobe qmi_wwan
@@ -116,12 +145,14 @@ This section outlines the steps to configure a Quectel RM520N-GL 5G card connect
          ls -lash /dev/cdc-wdm0
        #+END_SRC
 
-       If the driver is loaded successfully, you should see a device file like ~/dev/cdc-wdm0~.
+       If the driver is loaded successfully, you should see a device
+       file like ~/dev/cdc-wdm0~.
 
 2. *Configure QMI Connection:* (using ~quectel-CM~):
    Source: [[https://www.embeddedpi.com/documentation/3g-4g-modems/quectel-connection-manager-quectel-cm-lte-ec25][Quectel Modem Connection Manager]]
    + Install missing package
-     #+BEGIN_SRC sh
+
+     #+BEGIN_SRC sh :dir /sudo::
        sudo apt install dhcpcd5
 
        # Enable and start service
@@ -130,33 +161,42 @@ This section outlines the steps to configure a Quectel RM520N-GL 5G card connect
      #+END_SRC
 
    + Download the tar package
+
      #+BEGIN_SRC sh
+       mkdir ~/Downlods
        cd ~/Downloads
        wget https://github.com/mypiandrew/quectel-cm/releases/download/V1.6.0.12/quectel-CM.tar.gz
        tar xvf quectel-CM.tar.gz
      #+END_SRC
 
-   + Inside the ~quectel-CM~ directory,  we find bash scripts like ~install.sh~ and ~default.script~.
+   + Inside the ~quectel-CM~ directory, we find bash scripts like
+     ~install.sh~ and ~default.script~.
 
    + Change ~metric~ variable in line 20 in ~default.script~.
 
-   + Change ~UDHCPC_DIR~ should be ~/etc/udhcpc/~. And run ~install.sh~ as sudo.
+   + Change ~UDHCPC_DIR~ should be ~/etc/udhcpc/~. And run ~install.sh~ as
+     sudo.
 
    + Test connection using:
+
      #+BEGIN_SRC sh
        quectel-CM -s internet.swir -f /var/log/quectel-CM.log
      #+END_SRC
 
    + Check status of the modem
+
      #+BEGIN_SRC sh
        mmcli -L
        mmcli -m x # x depends on the command above.
      #+END_SRC
+
 * Verifying Network Connectivity
 
-Once you have configured your network connection (wired, wireless, or 5G), you can verify connectivity using the ~ping~ command.
+Once you have configured your network connection (wired, wireless, or
+5G), you can verify connectivity using the ~ping~ command.
 
-1. *Ping an External Host:* Try pinging a well-known website or IP address (e.g., Google's DNS server at ~8.8.8.8~).
+1. *Ping an External Host:* Try pinging a well-known website or IP
+   address (e.g., Google's DNS server at ~8.8.8.8~).
 
    #+BEGIN_SRC sh
      ping -I wwan0 -c 4 8.8.8.8
@@ -164,10 +204,14 @@ Once you have configured your network connection (wired, wireless, or 5G), you c
 
    If you receive replies, your network connection is likely working.
 
-2. *Ping Your Router/Gateway:* Ping the IP address of your router or gateway to verify connectivity within your local network.
+2. *Ping Your Router/Gateway:* Ping the IP address of your router or
+   gateway to verify connectivity within your local network.
 
    #+BEGIN_SRC sh
      ping -c 4 your_router_ip_address
    #+END_SRC
 
-Remember to replace placeholders like interface names (~eth0~, ~wlan0~, ~wwan0~), APNs, IP addresses, and file paths with the actual values relevant to your setup. Consult the documentation for your F2 carrier board and the Quectel RM520N-GL module for more specific information.
+Remember to replace placeholders like interface names (~eth0~, ~wlan0~,
+~wwan0~), APNs, IP addresses, and file paths with the actual values
+relevant to your setup. Consult the documentation for your F2 carrier
+board and the Quectel RM520N-GL module for more specific information.

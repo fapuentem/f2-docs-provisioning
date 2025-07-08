@@ -17,7 +17,7 @@ sudo apt update
 
 Install a set of common and useful packages for development and system monitoring.
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC sh :dir /sudo::
 sudo apt-get install git curl python3-pip stm32flash jq libqmi-utils udhcpc htop sysstat python3.8-venv -y
 #+END_SRC
 
@@ -37,13 +37,13 @@ sudo apt-get install git curl python3-pip stm32flash jq libqmi-utils udhcpc htop
 *(Note: These packages were also included in the [[file:3.first-boot-configuration.org][First Boot Configuration]] section. If you installed them there, you can skip these steps.)*
 
 - *jetson-stats:* A package to monitor and control your Jetson.
-  #+BEGIN_SRC sh
+  #+BEGIN_SRC sh :dir /sudo::
   sudo pip3 install -U jetson-stats
   #+END_SRC
   After installation, you can run ~jtop~ in the terminal to view system status.
 
 - *emacs:* Install the Emacs text editor using Snap.
-  #+BEGIN_SRC sh
+  #+BEGIN_SRC sh :dir /sudo::
   sudo snap install emacs --classic --beta
   #+END_SRC
 

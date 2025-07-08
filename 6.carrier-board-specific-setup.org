@@ -24,21 +24,21 @@ The Device Tree Blob (DTB) file contains critical information about the hardware
 
 3.  *Back Up the Original DTB File (Recommended):*
     Before replacing the original DTB file, it is strongly recommended to create a backup. This allows you to easily revert if the custom DTB causes issues.
-    #+BEGIN_SRC sh
+    #+BEGIN_SRC sh :dir /sudo::
       sudo cp /boot/dtb/kernel_tegra234-p3767-0001-p3768-0000-a0.dtb /boot/dtb/kernel_tegra234-p3767-0001-p3768-0000-a0.dtb.bak
     #+END_SRC
     Ensure the original filename matches the one from your ~extlinux.conf~.
 
 4.  *Copy the Custom F2 DTB File:*
     Copy the downloaded custom F2 DTB file to the ~/boot/dtb/~ directory, overwriting the original file. Use ~sudo~ as this requires root privileges.
-    #+BEGIN_SRC sh
+    #+BEGIN_SRC sh :dir /sudo::
       sudo cp /path/to/your/downloaded/kernel_tegra234-p3767-0001-p3768-0000-a0-bt40ne.dtb /boot/dtb/kernel_tegra234-p3767-0001-p3768-0000-a0.dtb
     #+END_SRC
     Replace ~/path/to/your/downloaded/~ with the actual path where you saved the downloaded ~.dtb~ file. Note that you are copying the custom file and renaming it to match the original DTB file name referenced in ~extlinux.conf~.
 
 5.  *Reboot the System:*
     For the new DTB file to be loaded and applied by the kernel, you must reboot the Jetson Orin.
-    #+BEGIN_SRC sh
+    #+BEGIN_SRC sh :dir /sudo::
       sudo reboot
     #+END_SRC
 

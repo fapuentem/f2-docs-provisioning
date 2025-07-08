@@ -5,40 +5,53 @@
 
 * Introduction
 
-This document provides a comprehensive guide for provisioning a Jetson Orin module on F2 carrier boards(v3.x). It outlines the necessary steps to flash the operating system, perform initial system configuration, set up networking, install essential software, and configure any carrier board-specific functionalities.
+This document provides a comprehensive guide for provisioning a Jetson
+Orin module on F2 carrier boards(v3.x). It outlines the necessary
+steps to flash the operating system, perform initial system
+configuration, set up networking, install essential software, and
+configure any carrier board-specific functionalities.
 
 * Target Audience
 
 This documentation is primarily intended for:
 
 - Developers working with the Jetson Orin platform.
-- Engineers responsible for setting up and deploying Jetson Orin based systems.
-- Technicians involved in the initial configuration and testing of the hardware.
+- Engineers responsible for setting up and deploying Jetson Orin based
+  systems.
+- Technicians involved in the initial configuration and testing of the
+  hardware.
 
-A basic understanding of Linux command-line operations and embedded systems concepts is recommended.
+A basic understanding of Linux command-line operations and embedded
+systems concepts is recommended.
 
 * Document Conventions
 
 The following conventions are used throughout this document:
 
-- *Code Blocks:* Commands to be executed in the terminal are displayed within ~src~ blocks:
+- *Code Blocks:* Commands to be executed in the terminal are displayed
+  within ~src~ blocks:
   #+BEGIN_SRC sh
   sudo apt update
   #+END_SRC
 
-- *Important Notes:* Important information or considerations are highlighted as follows:
+- *Important Notes:* Important information or considerations are
+  highlighted as follows:
   #+BEGIN_QUOTE
-  *IMPORTANT:* Ensure you have the correct power supply connected before proceeding.
+  *IMPORTANT:* Ensure you have the correct power supply connected before
+   proceeding.
   #+END_QUOTE
 
-- *Warnings:* Steps that could potentially lead to data loss or system instability are marked with a warning:
+- *Warnings:* Steps that could potentially lead to data loss or system
+  instability are marked with a warning:
   #+BEGIN_QUOTE
-  *WARNING:* Incorrectly flashing the module can render it unusable. Double-check all steps before execution.
+  *WARNING:* Incorrectly flashing the module can render it
+   unusable. Double-check all steps before execution.
   #+END_QUOTE
 
 - *Notes:* Additional helpful information or tips are presented as:
   #+BEGIN_QUOTE
-  *Note:* It is recommended to have a stable internet connection during the flashing process.
+  *Note:* It is recommended to have a stable internet connection during
+   the flashing process.
   #+END_QUOTE
 
 * Table of Contents
@@ -50,7 +63,8 @@ The following conventions are used throughout this document:
 
 * Quick Start Guide (Optional)
 
-For experienced users familiar with Jetson Orin provisioning, here's a brief overview of the main steps:
+For experienced users familiar with Jetson Orin provisioning, here's a
+brief overview of the main steps:
 
 1. [[file:1.prerequisites.org][Gather necessary hardware and software.]]
 2. [[file:2.jetson-orin-flash.org][Flash the Jetson Orin module using SDK Manager or JetPack CLI.]]
