@@ -54,8 +54,8 @@ following hardware, software, and tools available.
     - You might need to enable the ~universe~ repository on your Ubuntu
       system if you haven't already:
       #+BEGIN_SRC sh
-      sudo add-apt-repository universe
-      sudo apt update
+        sudo add-apt-repository universe
+        sudo apt update
       #+END_SRC
 - *Specific Python and pip versions:* SDK Manager might have specific
   requirements for Python and pip versions. It's generally recommended

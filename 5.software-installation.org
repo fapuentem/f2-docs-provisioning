@@ -10,7 +10,7 @@ This section details the installation of essential software packages, libraries,
 It's important to update your system's package lists to ensure you can install the latest versions of software available in the repositories.
 
 #+BEGIN_SRC sh
-sudo apt update
+  sudo apt update
 #+END_SRC
 
 * Installing Essential Packages
@@ -18,7 +18,7 @@ sudo apt update
 Install a set of common and useful packages for development and system monitoring.
 
 #+BEGIN_SRC sh :dir /sudo::
-sudo apt-get install git curl python3-pip stm32flash jq libqmi-utils udhcpc htop sysstat python3.8-venv -y
+  sudo apt-get install git curl python3-pip stm32flash jq libqmi-utils udhcpc htop sysstat python3.8-venv -y
 #+END_SRC
 
 - =git=: Version control system.
@@ -38,13 +38,13 @@ sudo apt-get install git curl python3-pip stm32flash jq libqmi-utils udhcpc htop
 
 - *jetson-stats:* A package to monitor and control your Jetson.
   #+BEGIN_SRC sh :dir /sudo::
-  sudo pip3 install -U jetson-stats
+    sudo pip3 install -U jetson-stats
   #+END_SRC
   After installation, you can run ~jtop~ in the terminal to view system status.
 
 - *emacs:* Install the Emacs text editor using Snap.
   #+BEGIN_SRC sh :dir /sudo::
-  sudo snap install emacs --classic --beta
+    sudo snap install emacs --classic --beta
   #+END_SRC
 
 * Verifying NVIDIA Drivers and Libraries
@@ -54,21 +54,21 @@ The core NVIDIA drivers, CUDA, cuDNN, TensorRT, and other JetPack components are
 - *Check Installed NVIDIA Packages:*
   Use ~dpkg~ to list installed packages and filter for those related to nvidia.
   #+BEGIN_SRC sh
-  dpkg -l | grep nvidia
+    dpkg -l | grep nvidia
   #+END_SRC
   This will show you a list of NVIDIA-related packages and their installed versions.
 
 - *Check CUDA Version:*
   If CUDA was installed (which it is by default with JetPack), you can check its version using the ~nvcc~ compiler.
   #+BEGIN_SRC sh
-  nvcc --version
+    nvcc --version
   #+END_SRC
   *(Note: If =nvcc= is not found, it might indicate an issue with the CUDA installation or environment path.)*
 
 - *Monitor Jetson Status with tegrastats:*
   The ~tegrastats~ utility provides real-time monitoring of the Jetson's CPU, GPU, power consumption, and other parameters. This implicitly verifies that the basic NVIDIA components are functioning.
   #+BEGIN_SRC sh
-  tegrastats
+    tegrastats
   #+END_SRC
   Press ~Ctrl+C~ to exit the ~tegrastats~ monitor.
 
