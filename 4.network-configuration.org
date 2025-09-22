@@ -183,14 +183,14 @@ connected via a USB interface.
    + Change ~metric~ variable in line 20 in ~default.script~.
 
      #+BEGIN_SRC sh
-       sed -i '20s/^metric=0$/metric=2357/' ~/Downloads/quectel-CM/default.script
+       sed -i -E '20s/^([[:blank:]]*)metric=0([[:blank:]]*)$/\1metric=2357\2/' ~/Downloads/quectel-CM/default.script
      #+END_SRC
 
    + Change ~UDHCPC_DIR~ should be ~/etc/udhcpc/~. And run ~install.sh~ as
      sudo.
 
      #+BEGIN_SRC sh
-       sed -i 's|^UDHCPC_DIR=/usr/share/udhcpc$|UDHCPC_DIR=/etc/udhcpc|' ~/Downloads/quectel-CM/default.script
+       sed -i 's|^UDHCPC_DIR=/usr/share/udhcpc$|UDHCPC_DIR=/etc/udhcpc|' ~/Downloads/quectel-CM/install.sh
      #+END_SRC
 
    + Test connection using:
