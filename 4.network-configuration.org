@@ -159,6 +159,14 @@ connected via a USB interface.
 
 2. *Configure QMI Connection:* (using ~quectel-CM~):
    Source: [[https://www.embeddedpi.com/documentation/3g-4g-modems/quectel-connection-manager-quectel-cm-lte-ec25][Quectel Modem Connection Manager]]
+
+   + Check status of the modem
+
+     #+BEGIN_SRC sh
+       MODEM_ID=$(mmcli -L | grep -m1 -o 'Modem/[0-9]\+' | cut -d/ -f2)
+       mmcli -m "$MODEM_ID"
+     #+END_SRC
+
    + Install missing package
 
      #+BEGIN_SRC sh :dir /sudo::
@@ -203,13 +211,6 @@ connected via a USB interface.
 
      #+BEGIN_SRC sh :dir /sudo::
        quectel-CM -s internet.swir -f /var/log/quectel-CM.log &
-     #+END_SRC
-
-   + Check status of the modem
-
-     #+BEGIN_SRC sh
-       MODEM_ID=$(mmcli -L | grep -m1 -o 'Modem/[0-9]\+' | cut -d/ -f2)
-       mmcli -m "$MODEM_ID"
      #+END_SRC
 
 * Verifying Network Connectivity
