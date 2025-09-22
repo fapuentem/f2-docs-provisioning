@@ -174,7 +174,7 @@ connected via a USB interface.
      #+BEGIN_SRC sh
        mkdir -p ~/Downloads
        wget -P ~/Downloads/ https://github.com/mypiandrew/quectel-cm/releases/download/V1.6.0.12/quectel-CM.tar.gz
-       tar xvf ~/Downloads/quectel-CM.tar.gz
+       tar xvf ~/Downloads/quectel-CM.tar.gz -C ~/Downloads/
      #+END_SRC
 
    + Inside the ~quectel-CM~ directory, we find bash scripts like
