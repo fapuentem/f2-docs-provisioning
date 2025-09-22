@@ -1,6 +1,7 @@
 #+TITLE: 4. Network Configuration
 #+AUTHOR: Visiontech Consulting Inc.
 #+DATE: <2025-04-10 Thu>
+#+PROPERTY: header-args :results silent
 #+OPTIONS: toc:nil num:nil
 
 This section describes how to configure network connectivity on your
@@ -105,6 +106,12 @@ the command line.
 This section outlines the steps to configure a Quectel RM520N-GL 5G
 card connected to your F2 carrier board. This assumes the card is
 connected via a USB interface.
+0. Org babel Emacs configuration
+   #+BEGIN_SRC elisp
+     (org-babel-do-load-languages
+          'org-babel-load-languages
+          '((shell . t)))
+   #+END_SRC
 
 1. *Install ~qmi_wwan~ Driver:*
    - *Check if Driver Exists:* First, check if the ~qmi_wwan~ driver is
@@ -123,8 +130,8 @@ connected via a USB interface.
      in,
 
      #+BEGIN_SRC
-       cd tools
-       git clone https://github.com/fapuentem/f2-maintenance-tools.git
+       mkdir -p ~/tools
+       git clone https://github.com/fapuentem/f2-maintenance-tools.git ~/tools/
      #+END_SRC
 
      You can try loading it.
@@ -134,9 +141,9 @@ connected via a USB interface.
      #+END_SRC
 
      #+BEGIN_SRC sh :dir /sudo::
-       sudo cp qmi_wwan.ko /lib/modules/5.10.120-tegra/kernel/drivers/net/
-       sudo depmod
-       sudo modprobe qmi_wwan
+       cp /home/nvidia/tools/f2-maintenance-tools/qmi_wwan.ko /lib/modules/5.10.120-tegra/kernel/drivers/net/
+       depmod
+       modprobe qmi_wwan
      #+END_SRC
 
      - *Verify Driver Loaded:*
@@ -153,20 +160,19 @@ connected via a USB interface.
    + Install missing package
 
      #+BEGIN_SRC sh :dir /sudo::
-       sudo apt install dhcpcd5
+       apt install dhcpcd5
 
        # Enable and start service
-       sudo systemctl enable dhcpcd
-       sudo systemctl start dhcpcd
+       systemctl enable dhcpcd
+       systemctl start dhcpcd
      #+END_SRC
 
    + Download the tar package
 
      #+BEGIN_SRC sh
-       mkdir ~/Downlods
-       cd ~/Downloads
-       wget https://github.com/mypiandrew/quectel-cm/releases/download/V1.6.0.12/quectel-CM.tar.gz
-       tar xvf quectel-CM.tar.gz
+       mkdir -p ~/Downloads
+       wget -P ~/Downloads/ https://github.com/mypiandrew/quectel-cm/releases/download/V1.6.0.12/quectel-CM.tar.gz
+       tar xvf ~/Downloads/quectel-CM.tar.gz
      #+END_SRC
 
    + Inside the ~quectel-CM~ directory, we find bash scripts like
@@ -174,20 +180,28 @@ connected via a USB interface.
 
    + Change ~metric~ variable in line 20 in ~default.script~.
 
+     #+BEGIN_SRC sh
+       sed -i '20s/^metric=0$/metric=2357/' ~/Downloads/quectel-CM/default.script
+     #+END_SRC
+
    + Change ~UDHCPC_DIR~ should be ~/etc/udhcpc/~. And run ~install.sh~ as
      sudo.
 
+     #+BEGIN_SRC sh
+       sed -i 's|^UDHCPC_DIR=/usr/share/udhcpc$|UDHCPC_DIR=/etc/udhcpc|' ~/Downloads/quectel-CM/default.script
+     #+END_SRC
+
    + Test connection using:
 
-     #+BEGIN_SRC sh
-       quectel-CM -s internet.swir -f /var/log/quectel-CM.log
+     #+BEGIN_SRC sh :dir /sudo::
+       quectel-CM -s internet.swir -f /var/log/quectel-CM.log &
      #+END_SRC
 
    + Check status of the modem
 
      #+BEGIN_SRC sh
-       mmcli -L
-       mmcli -m x # x depends on the command above.
+       MODEM_ID=$(mmcli -L | grep -m1 -o 'Modem/[0-9]\+' | cut -d/ -f2)
+       mmcli -m "$MODEM_ID"
      #+END_SRC
 
 * Verifying Network Connectivity
