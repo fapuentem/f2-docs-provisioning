@@ -13,6 +13,11 @@ It's important to update your system's package lists to ensure you can install t
   apt update
 #+END_SRC
 
+* F2 Maintenance Tools
+
+* F2 App
+
+* Mender Client
 
 * Verifying NVIDIA Drivers and Libraries
 
