@@ -106,7 +106,9 @@ the command line.
 This section outlines the steps to configure a Quectel RM520N-GL 5G
 card connected to your F2 carrier board. This assumes the card is
 connected via a USB interface.
+
 0. Org babel Emacs configuration
+
    #+BEGIN_SRC elisp
      (org-babel-do-load-languages
           'org-babel-load-languages
@@ -129,9 +131,9 @@ connected via a USB interface.
      module. We already build it, and you can find th ~qmi_wwan.ko~ file
      in,
 
-     #+BEGIN_SRC
+     #+BEGIN_SRC sh
        mkdir -p ~/tools
-       git clone https://github.com/fapuentem/f2-maintenance-tools.git ~/tools/
+       git clone https://github.com/fapuentem/f2-maintenance-tools.git ~/tools/f2-maintenance-tools
      #+END_SRC
 
      You can try loading it.
