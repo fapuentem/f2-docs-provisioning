@@ -195,7 +195,7 @@ connected via a USB interface.
 
    + Install ~quectel-CM~
 
-     #+BEGIN_SRC sh :dir /sudo::
+     #+BEGIN_SRC sh :dir /sudo::/home/nvidia/Downloads/quectel-CM
        /bin/bash /home/nvidia/Downloads/quectel-CM/install.sh
      #+END_SRC
 
