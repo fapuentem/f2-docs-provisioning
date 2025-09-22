@@ -56,7 +56,7 @@ console, you can proceed with the initial system configuration.
 1. *Update and Upgrade Packages:* It's a good practice to update the
    package lists and upgrade existing packages to the latest versions.
 
-   #+BEGIN_SRC sh :dir /sudo::
+   #+BEGIN_SRC sh
      sudo apt-get update
      sudo apt-get upgrade -y
    #+END_SRC
@@ -64,21 +64,21 @@ console, you can proceed with the initial system configuration.
 2. *Install Essential Software and Tools:* Install commonly used tools
    and libraries.
 
-   #+BEGIN_SRC sh :dir /sudo::
+   #+BEGIN_SRC sh
      sudo apt-get install git curl python3-pip stm32flash jq libqmi-utils udhcpc htop sysstat python3.8-venv -y
    #+END_SRC
 
 3. *Install ~jetson-stats~:* This utility provides useful information
    about the Jetson's performance and resource usage.
 
-   #+BEGIN_SRC sh :dir /sudo::
+   #+BEGIN_SRC sh
      sudo pip3 install -U jetson-stats
    #+END_SRC
 
 4. *Install ~emacs~:* If you prefer the Emacs editor, you can install it
    using Snap.
 
-   #+BEGIN_SRC sh :dir /sudo::
+   #+BEGIN_SRC sh
      sudo snap install emacs --classic --beta
    #+END_SRC
 
