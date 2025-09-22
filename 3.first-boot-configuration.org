@@ -67,6 +67,17 @@ console, you can proceed with the initial system configuration.
    #+BEGIN_SRC sh
      sudo apt-get install git curl python3-pip stm32flash jq libqmi-utils udhcpc htop sysstat python3.8-venv -y
    #+END_SRC
+   - =git=: Version control system.
+   - =curl=: Tool for transferring data with URLs.
+   - =python3-pip=: Package installer for Python 3.
+   - =stm32flash=: Utility for flashing STM32 microcontrollers.
+   - =jq=: Command-line JSON processor.
+   - =libqmi-utils=: Utilities for communicating with WWAN modems using the QMI protocol (useful for 5G modem like the Quectel RM520N-GL).
+   - =udhcpc=: A small DHCP client.
+   - =htop=: Interactive process viewer.
+   - =sysstat=: Utilities for performance monitoring.
+   - =python3.8-venv=: Creates lightweight virtual environments for Python.
+
 
 3. *Install ~jetson-stats~:* This utility provides useful information
    about the Jetson's performance and resource usage.
