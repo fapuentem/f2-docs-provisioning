@@ -1,6 +1,7 @@
 #+TITLE: 5. Software Installation
 #+AUTHOR: Visiontech Consulting Inc.
 #+DATE: <2025-04-21 Mon>
+#+PROPERTY: header-args :results silent
 #+OPTIONS: toc:nil num:nil
 
 This section details the installation of essential software packages, libraries, and development tools on your Jetson Orin module running on the F2 carrier board. While the core NVIDIA drivers and libraries are installed during the initial flashing process, this section covers additional useful software and how to verify your NVIDIA installation.
@@ -14,6 +15,19 @@ It's important to update your system's package lists to ensure you can install t
 #+END_SRC
 
 * F2 Maintenance Tools
+1. Create ~~/tool~ directory and clone project.
+
+   #+BEGIN_SRC sh
+     mkdir -p ~/tools
+     git clone https://github.com/fapuentem/f2-maintenance-tools.git
+   #+END_SRC
+
+2. Update the ~~/.bashrc~ file
+
+   #+BEGIN_SRC sh
+    cat ~/project/f2-maintenance-tools/alias-f2.sh >> ~/.bashrc
+    source ~/.bashrc
+   #+END_SRC
 
 * F2 App
 
