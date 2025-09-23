@@ -51,8 +51,10 @@ network.
 Wi-Fi cards AX210 requieres of a small trick:
 
 #+BEGIN_SRC sh :dir /sudo::
-mv /lib/firmware/iwlwifi-ty-a0-gf-a0.pnvm /lib/firmware/iwlwifi-ty-a0-gf-a0.pnvm.bck
+  mv /lib/firmware/iwlwifi-ty-a0-gf-a0.pnvm /lib/firmware/iwlwifi-ty-a0-gf-a0.pnvm.bck
 #+END_SRC
+
+Reboot the board after run the command.
 
 1. *Enable Wi-Fi (if necessary):* Use the network management tools to
    ensure Wi-Fi is enabled.
@@ -73,6 +75,12 @@ mv /lib/firmware/iwlwifi-ty-a0-gf-a0.pnvm /lib/firmware/iwlwifi-ty-a0-gf-a0.pnvm
 
 You can use the ~wpa_supplicant~ tool to connect to a Wi-Fi network from
 the command line.
+
+0. Scan for Wi-Fi networks
+
+   #+BEGIN_SRC sh
+     nmcli device wifi list
+   #+END_SRC
 
 1. *Configure ~wpa_supplicant.conf~:* You might need to create or edit the
    ~/etc/wpa_supplicant/wpa_supplicant.conf~ file.
