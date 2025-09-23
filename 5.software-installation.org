@@ -25,7 +25,7 @@ It's important to update your system's package lists to ensure you can install t
 2. Update the ~~/.bashrc~ file
 
    #+BEGIN_SRC sh
-    cat ~/project/f2-maintenance-tools/alias-f2.sh >> ~/.bashrc
+    cat ~/tools/f2-maintenance-tools/alias-f2.sh >> ~/.bashrc
     source ~/.bashrc
    #+END_SRC
 
