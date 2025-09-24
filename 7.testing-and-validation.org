@@ -1,6 +1,7 @@
 #+TITLE: 7. Testing and Validation
-#+AUTHOR: Visiontech Consulting Inc.
+#+AUTHOR: Fabricio Puente M.
 #+DATE: <2025-04-09 Wed>
+#+EMAIL: fpuentem@visiontechconsulting.ca
 #+OPTIONS: toc:nil num:nil
 
 After completing the provisioning process, it's crucial to perform various tests to validate that the Jetson Orin module and the F2 carrier board are functioning correctly and that all necessary software is installed and accessible.

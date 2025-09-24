@@ -1,7 +1,27 @@
 #+TITLE: 0. README
-#+AUTHOR: Visiontech Consulting Inc.
+#+AUTHOR: Fabricio Puente Mansilla
 #+DATE: <2025-04-09 Wed>
+#+EMAIL: fpuentem@visiontechconsulting.ca
 #+OPTIONS: toc:nil num:nil
+
+* README :noexport:
+This is a literate document that can potentially execute code on your computer! It's about how to
+build Emacs on Debian and Redhat machines.
+
+* Document constants :noexport:
+:PROPERTIES:
+:deb_distro: Debian
+:END:
+
+* Code :noexport:
+#+NAME: startup
+#+begin_src elisp :results none
+  (load-theme 'modus-vivendi)
+  (setf fill-column 100)
+    (org-babel-do-load-languages
+     'org-babel-load-languages
+     '((shell . t)))
+#+end_src
 
 * Introduction
 
@@ -75,3 +95,8 @@ brief overview of the main steps:
 7. [[file:7.testing-and-validation.org][Test and validate the system functionality.]]
 
 Refer to the respective sections for detailed instructions.
+
+# Local Variables:
+# org-confirm-babel-evaluate: (lambda (lang body) (not (string= lang "elisp")))
+# eval: (org-babel-goto-named-src-block "startup") (org-babel-execute-src-block)
+# End:

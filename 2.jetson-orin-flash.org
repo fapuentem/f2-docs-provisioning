@@ -1,6 +1,7 @@
 #+TITLE: 2. Flashing the Jetson Orin Module
-#+AUTHOR: Visiontech Consulting Inc.
+#+AUTHOR: Fabricio Puente Mansilla
 #+DATE: <2025-04-09 Wed>
+#+EMAIL: fpuentem@visiontechconsulting.ca
 #+OPTIONS: toc:nil num:nil
 
 This section details the process of flashing the operating system onto your Jetson Orin module using the NVIDIA SDK Manager on an Ubuntu host machine.

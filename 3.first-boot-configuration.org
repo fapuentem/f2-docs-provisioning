@@ -1,6 +1,7 @@
 #+TITLE: 3. First Boot Configuration
-#+AUTHOR: Visiontech Consulting Inc.
-#+DATE: <2025-04-10 Thu>
+#+AUTHOR: Fabricio Puente Mansilla
+#+DATE: <2025-04-09 Wed>
+#+EMAIL: fpuentem@visiontechconsulting.ca
 #+OPTIONS: toc:nil num:nil
 
 After successfully flashing the Jetson Orin module, this section

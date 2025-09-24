@@ -1,6 +1,7 @@
 #+TITLE: 1. Prerequisites
-#+AUTHOR: Visiontech Consulting Inc.
+#+AUTHOR: Fabricio Puente Mansilla
 #+DATE: <2025-04-09 Wed>
+#+EMAIL: fpuentem@visiontechconsulting.ca
 #+OPTIONS: toc:nil num:nil
 
 Before starting the provisioning process, ensure you have the
