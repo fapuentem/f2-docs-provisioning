@@ -3,7 +3,8 @@
 #+DATE: <2025-04-21 Mon>
 #+EMAIL: fpuentem@visiontechconsulting.ca
 #+PROPERTY: header-args :results silent
-#+OPTIONS: toc:nil num:nil
+#+EXCLUDE_TAGS: noexport debian
+#+OPTIONS: email:t toc:nil num:nil
 
 This section details the installation of essential software packages, libraries, and development tools on your Jetson Orin module running on the F2 carrier board. While the core NVIDIA drivers and libraries are installed during the initial flashing process, this section covers additional useful software and how to verify your NVIDIA installation.
 

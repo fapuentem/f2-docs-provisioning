@@ -2,7 +2,8 @@
 #+AUTHOR: Fabricio Puente Mansilla
 #+DATE: <2025-04-09 Wed>
 #+EMAIL: fpuentem@visiontechconsulting.ca
-#+OPTIONS: toc:nil num:nil
+#+EXCLUDE_TAGS: noexport debian
+#+OPTIONS: email:t toc:nil num:nil
 
 Before starting the provisioning process, ensure you have the
 following hardware, software, and tools available.

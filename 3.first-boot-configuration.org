@@ -2,7 +2,8 @@
 #+AUTHOR: Fabricio Puente Mansilla
 #+DATE: <2025-04-09 Wed>
 #+EMAIL: fpuentem@visiontechconsulting.ca
-#+OPTIONS: toc:nil num:nil
+#+EXCLUDE_TAGS: noexport debian
+#+OPTIONS: email:t toc:nil num:nil
 
 After successfully flashing the Jetson Orin module, this section
 guides you through the initial operating system setup.

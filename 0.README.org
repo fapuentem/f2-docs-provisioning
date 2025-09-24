@@ -2,7 +2,8 @@
 #+AUTHOR: Fabricio Puente Mansilla
 #+DATE: <2025-04-09 Wed>
 #+EMAIL: fpuentem@visiontechconsulting.ca
-#+OPTIONS: toc:nil num:nil
+#+EXCLUDE_TAGS: noexport debian
+#+OPTIONS: email:t toc:nil num:nil
 
 * README :noexport:
 This is a literate document that can potentially execute code on your computer! It's about how to

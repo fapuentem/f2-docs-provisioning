@@ -2,9 +2,9 @@
 #+AUTHOR: Fabricio Puente M.
 #+DATE: <2025-04-21 Mon>
 #+EMAIL: fpuentem@visiontechconsulting.ca
+#+EXCLUDE_TAGS: noexport debian
+#+OPTIONS: email:t toc:nil num:nil
 #+PROPERTY: header-args :results silent
-#+OPTIONS: toc:nil num:nil
-
 
 This section covers configuration steps specifically required for the F2 custom carrier board to ensure all its features and peripherals function correctly with the Jetson Orin module.
 
