@@ -99,5 +99,8 @@ Refer to the respective sections for detailed instructions.
 
 # Local Variables:
 # org-confirm-babel-evaluate: (lambda (lang body) (not (string= lang "elisp")))
-# eval: (org-babel-goto-named-src-block "startup") (org-babel-execute-src-block)
+# eval: (progn
+#         (when (fboundp 'org-babel-goto-named-src-block)
+#           (org-babel-goto-named-src-block "startup")
+#           (org-babel-execute-src-block)))
 # End:
