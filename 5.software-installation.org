@@ -27,8 +27,18 @@ It's important to update your system's package lists to ensure you can install t
 2. Update the ~~/.bashrc~ file
 
    #+BEGIN_SRC sh
-    cat ~/tools/f2-maintenance-tools/alias-f2.sh >> ~/.bashrc
-    source ~/.bashrc
+     cat ~/tools/f2-maintenance-tools/alias-f2.sh >> ~/.bashrc
+     source ~/.bashrc
+   #+END_SRC
+
+3. Get S/N of Jetson Orin NX SoM
+   #+BEGIN_SRC sh
+     cat /sys/firmware/devicetree/base/serial-number
+   #+END_SRC
+
+4. Get S/N of F2 carrier board
+   #+BEGIN_SRC sh :dir /sudo::
+     i2ctransfer -f -y 1 w1@0x58 0x80 r16 | sed 's/0x//g'
    #+END_SRC
 
 * F2 App
