@@ -17,6 +17,7 @@ It's important to update your system's package lists to ensure you can install t
 #+END_SRC
 
 * F2 Maintenance Tools
+
 1. Create ~~/tool~ directory and clone project.
 
    #+BEGIN_SRC sh
@@ -42,6 +43,37 @@ It's important to update your system's package lists to ensure you can install t
    #+END_SRC
 
 * F2 App
+
+1. Clone F2 App repository
+
+   #+BEGIN_SRC sh
+     mkdir -p ~/projects
+     git clone https://github.com/VisiontechProjects/F2_App_Main.git ~/projects/F2-App
+   #+END_SRC
+
+2. Prepare virtual environment
+
+   #+BEGIN_SRC sh :dir ~/projects/F2-App
+     python3 -m venv .venv
+     ./.venv/bin/pip3 install -r requirements.txt
+   #+END_SRC
+
+3. Flash firmware in STM32 MCUs
+   + Unlock bootloader
+
+     #+BEGIN_SRC sh :dir ~/projects/F2-App/firmware
+       sudo ../.venv/bin/python3 unlock_bootloader_stm32f091.py #
+     #+END_SRC
+
+   + Flash STM32 MCUs
+
+     #+BEGIN_SRC sh
+       # Pay attention to the outputs, in case of warnings run again
+       sudo  ../.venv/bin/python3 update_firmware_stm32f030.py
+       sudo  ../.venv/bin/python3 update_firmware_stm32f091.py
+     #+END_SRC
+
+4. xD
 
 * Mender Client
 
