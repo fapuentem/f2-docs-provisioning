@@ -61,16 +61,16 @@ It's important to update your system's package lists to ensure you can install t
 3. Flash firmware in STM32 MCUs
    + Unlock bootloader
 
-     #+BEGIN_SRC sh :dir /sudo::~/projects/F2-App/firmware
+     #+BEGIN_SRC sh :dir /sudo::/home/nvidia/projects/F2-App/firmware
        ../.venv/bin/python3 unlock_bootloader_stm32f091.py #
      #+END_SRC
 
    + Flash STM32 MCUs
 
-     #+BEGIN_SRC sh :dir /sudo::~/projects/F2-App/firmware
+     #+BEGIN_SRC sh :dir /sudo::/home/nvidia/projects/F2-App/firmware
        # Pay attention to the outputs, in case of warnings run again
-       sudo  ../.venv/bin/python3 update_firmware_stm32f030.py
-       sudo  ../.venv/bin/python3 update_firmware_stm32f091.py
+       ../.venv/bin/python3 update_firmware_stm32f030.py
+       ../.venv/bin/python3 update_firmware_stm32f091.py
      #+END_SRC
 
 4. xD
