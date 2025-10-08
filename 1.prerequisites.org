@@ -104,7 +104,6 @@ following hardware, software, and tools available.
      #+RESULTS:
      : cuda-keyring installed successfully (repo: cuda-ubuntu2204-x86_64.list)
 
-
   3. Install ~sdkmanager~
 
      #+BEGIN_SRC shell :results output replace :exports both :dir /sudo::
@@ -146,7 +145,6 @@ following hardware, software, and tools available.
 - *ESD Protection (Wrist Strap):* Highly recommended to prevent
   electrostatic discharge that could damage sensitive electronic
   components during handling.
-- Fanstel flasher board. It is required for carrier boards < v3.1.
 
 Once you have gathered all the necessary prerequisites, you can
 proceed with flashing the Jetson Orin module.
