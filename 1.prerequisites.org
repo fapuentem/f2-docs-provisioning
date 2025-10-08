@@ -2,7 +2,6 @@
 #+AUTHOR: Fabricio Puente Mansilla
 #+DATE: <2025-04-09 Wed>
 #+EMAIL: fpuentem@visiontechconsulting.ca
-#+PROPERTY: header-args :results silent
 #+EXCLUDE_TAGS: noexport debian
 #+OPTIONS: email:t toc:nil num:nil
 
@@ -37,18 +36,23 @@ following hardware, software, and tools available.
 * Software Requirements (on the Host Computer - Ubuntu)
 
 - Update and upgrade repository.
-  #+BEGIN_SRC shell :dir /sudo::
+
+  #+BEGIN_SRC shell :results none :exports code :dir /sudo::
     apt update
     apt upgrade -y
  #+END_SRC
 
 - Install requirements
-  #+BEGIN_SRC shell :dir /sudo::
+
+  #+BEGIN_SRC shell :results none :exports code :dir /sudo::
     apt install git
  #+END_SRC
+
 - *NVIDIA SDK Manager:* Download and install the latest version of
   NVIDIA SDK Manager from the official NVIDIA repositories:
+
   1. Download the ~.deb~ package.
+
      #+BEGIN_SRC shell :dir ~/Downloads :results output
        # Compute NVIDIA's token: ubuntu1804 / 2004 / 2204 / 2404
        distro=$( . /etc/os-release; printf "ubuntu%s" "${VERSION_ID//./}" )
@@ -58,12 +62,14 @@ following hardware, software, and tools available.
      #+END_SRC
 
   2. Install ~.deb~ package
-     #+BEGIN_SRC shell :dir /sudo::~/Downloads/
+
+     #+BEGIN_SRC shell :results none :exports code :dir /sudo::~/Downloads/
        dpkg -i cuda-keyring_1.1-1_all.deb
      #+END_SRC
 
   3. Install ~sdkmanager~
-     #+BEGIN_SRC shell :dir /sudo::~/Downloads/
+
+     #+BEGIN_SRC shell :results none :exports code :dir /sudo::~/Downloads/
        apt-get update
        apt-get -y install sdkmanager
      #+END_SRC
