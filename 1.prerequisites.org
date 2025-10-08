@@ -20,7 +20,7 @@ following hardware, software, and tools available.
   - Recommendation: A high-quality USB cable is recommended to avoid
     data transfer issues during flashing.
 - *Host Computer:*
-  - Operating System: Ubuntu GNU/Linux 20.04 LTS or 22.04 LTS is
+  - Operating System: Ubuntu GNU/Linux 18.04 LTS or 20.04 LTS is
     recommended for optimal compatibility with NVIDIA SDK Manager).
   - Processor: i5
   - RAM: 8GB or more recommended
@@ -35,12 +35,38 @@ following hardware, software, and tools available.
 
 * Software Requirements (on the Host Computer - Ubuntu)
 
-- *NVIDIA SDK Manager:*
-  - Download and install the latest version of NVIDIA SDK Manager from
-    the official NVIDIA Developer website:
-    [[https://developer.nvidia.com/sdk-manager]]
-  - You will need an NVIDIA Developer account to download and use SDK
-    Manager.
+- Update and upgrade repository.
+  #+BEGIN_SRC shell :dir /sudo::
+    apt update
+    apt upgrade -y
+ #+END_SRC
+
+- Install requirements
+  #+BEGIN_SRC shell :dir /sudo::
+    apt install git
+ #+END_SRC
+- *NVIDIA SDK Manager:* Download and install the latest version of
+  NVIDIA SDK Manager from the official NVIDIA repositories:
+  1. Download the ~.deb~ package.
+     #+BEGIN_SRC shell :dir ~/Downloads :results output
+       # Compute NVIDIA's token: ubuntu1804 / 2004 / 2204 / 2404
+       distro=$( . /etc/os-release; printf "ubuntu%s" "${VERSION_ID//./}" )
+
+       echo "Using distro: $distro"
+       wget "https://developer.download.nvidia.com/compute/cuda/repos/${distro}/x86_64/cuda-keyring_1.1-1_all.deb"
+     #+END_SRC
+
+  2. Install ~.deb~ package
+     #+BEGIN_SRC shell :dir /sudo::~/Downloads/
+       dpkg -i cuda-keyring_1.1-1_all.deb
+     #+END_SRC
+
+  3. Install ~sdkmanager~
+     #+BEGIN_SRC shell :dir /sudo::~/Downloads/
+       apt-get update
+       apt-get -y install sdkmanager
+     #+END_SRC
+
 - *Dependencies for SDK Manager:*
   - Ensure your Ubuntu system has the necessary dependencies
     installed. SDK Manager usually prompts for these during
@@ -55,10 +81,10 @@ following hardware, software, and tools available.
     - ~zip~
     - You might need to enable the ~universe~ repository on your Ubuntu
       system if you haven't already:
-      #+BEGIN_SRC sh
+      ,#+BEGIN_SRC sh
         sudo add-apt-repository universe
         sudo apt update
-      #+END_SRC
+    #+END_SRC
 - *Specific Python and pip versions:* SDK Manager might have specific
   requirements for Python and pip versions. It's generally recommended
   to use the versions that come with a recent stable Ubuntu
