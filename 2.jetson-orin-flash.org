@@ -23,14 +23,14 @@ Before starting the flashing process, ensure the following:
     [[./images/recovery-button.png]]
 - *Power Supply:* Have the correct power supply for your F2 carrier board ready to be connected after the module is in Force Recovery Mode.
 
-* Downloading SDK Manager/JetPack
+* Downloading SDK  JetPack
 
 1. *Open NVIDIA SDK Manager:* You can usually find it in your Ubuntu application menu or by running the ~sdkmanager~ command in your terminal.
 2. *Log in:* Enter your NVIDIA Developer account credentials.
 3. *Select Target Hardware:*
    - In the "Product Category" block, choose the *Jetson* family.
    - Then, select your specific *Jetson Orin module* (e.g., Jetson Orin NX series, Jetson Orin Nano series).
-   - Under "SDK Version," the default (usually the latest JetPack version) is generally recommended. We use *JetPack 5.1.3*.
+   - Under "SDK Version," the default (usually the latest JetPack version) is generally recommended. We use *JetPack 5.1.2*.
    - Also, choose *DeepStream* in "Additional SDKs".
    [[./images/sdkmanager-step-1.png]]
 4. *Select Host Machine:* Ensure your host machine is correctly identified (should be your Ubuntu system).
