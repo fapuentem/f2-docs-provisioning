@@ -63,15 +63,59 @@ following hardware, software, and tools available.
 
   2. Install ~.deb~ package
 
-     #+BEGIN_SRC shell :results none :exports code :dir /sudo::~/Downloads/
-       dpkg -i cuda-keyring_1.1-1_all.deb
+     #+BEGIN_SRC shell :results none :exports both :dir /sudo::~/Downloads/
+       set -u
+       export DEBIAN_FRONTEND=noninteractive
+       deb="cuda-keyring_1.1-1_all.deb"
+
+       # 1) sanity check
+       if [ ! -f "$deb" ]; then
+         echo "ERROR: $deb not found in ~/Downloads."
+         exit 1
+       fi
+
+       # 2) install keyring; if deps are missing, fix them quietly
+       if dpkg -i "$deb" >/dev/null 2>&1 || apt-get -qq -y -f install >/dev/null 2>&1; then
+         # 3) verify package is installed
+         if dpkg -s cuda-keyring >/dev/null 2>&1; then
+           # optional: refresh apt so next steps see NVIDIA repo
+           apt-get -qq update >/dev/null 2>&1 || true
+           # show which repo file got installed (if any)
+           repo_file=$(ls /etc/apt/sources.list.d/cuda-*.list 2>/dev/null | head -n1)
+           if [ -n "$repo_file" ]; then
+             echo "cuda-keyring installed successfully (repo: $(basename "$repo_file"))"
+           else
+             echo "cuda-keyring installed successfully"
+           fi
+         else
+           echo "ERROR: cuda-keyring not found after install."
+           exit 1
+         fi
+       else
+         echo "ERROR: cuda-keyring installation failed. Check /var/log/dpkg.log"
+         exit 1
+       fi
      #+END_SRC
 
   3. Install ~sdkmanager~
 
-     #+BEGIN_SRC shell :results none :exports code :dir /sudo::~/Downloads/
-       apt-get update
-       apt-get -y install sdkmanager
+     #+BEGIN_SRC shell :results output :exports both :dir /sudo::~/Downloads/
+       export DEBIAN_FRONTEND=noninteractive
+
+       # try to install quietly (no apt spam)
+       if apt-get -qq update >/dev/null 2>&1 \
+          && apt-get -qq -y install sdkmanager >/dev/null 2>&1; then
+         # double-check it’s on PATH and show version
+         if command -v sdkmanager >/dev/null 2>&1; then
+           echo "sdkmanager installed successfully ($(sdkmanager --version 2>/dev/null || echo version unknown))"
+         else
+           echo "sdkmanager installation completed, but executable not found on PATH."
+           exit 1
+         fi
+       else
+         echo "sdkmanager installation failed. See /var/log/apt/history.log for details."
+         exit 1
+       fi
      #+END_SRC
 
 - *Dependencies for SDK Manager:*
