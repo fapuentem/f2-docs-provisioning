@@ -2,6 +2,7 @@
 #+AUTHOR: Fabricio Puente Mansilla
 #+DATE: <2025-04-09 Wed>
 #+EMAIL: fpuentem@visiontechconsulting.ca
+#+PROPERTY: header-args :results silent
 #+EXCLUDE_TAGS: noexport debian
 #+OPTIONS: email:t toc:nil num:nil
 
