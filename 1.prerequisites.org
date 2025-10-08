@@ -2,7 +2,7 @@
 #+AUTHOR: Fabricio Puente Mansilla
 #+DATE: <2025-04-09 Wed>
 #+EMAIL: fpuentem@visiontechconsulting.ca
-#+EXCLUDE_TAGS: noexport debian
+#+EXCLUDE_TAGS: noexport
 #+OPTIONS: email:t toc:nil num:nil
 
 Before starting the provisioning process, ensure you have the
@@ -45,7 +45,7 @@ following hardware, software, and tools available.
 - Install requirements
 
   #+BEGIN_SRC shell :results none :exports code :dir /sudo::
-    apt install git
+    apt install git htop
  #+END_SRC
 
 - *NVIDIA SDK Manager:* Download and install the latest version of
@@ -61,22 +61,26 @@ following hardware, software, and tools available.
        wget "https://developer.download.nvidia.com/compute/cuda/repos/${distro}/x86_64/cuda-keyring_1.1-1_all.deb"
      #+END_SRC
 
+     #+RESULTS:
+     : Using distro: ubuntu2204
+
   2. Install ~.deb~ package
 
-     #+BEGIN_SRC shell :results none :exports both :dir /sudo::~/Downloads/
+     #+BEGIN_SRC shell :results output replace :exports both :var path="/home/fabricio/Downloads" :dir /sudo::
        set -u
        export DEBIAN_FRONTEND=noninteractive
        deb="cuda-keyring_1.1-1_all.deb"
+       deb_path="$path/$deb"
 
        # 1) sanity check
-       if [ ! -f "$deb" ]; then
-         echo "ERROR: $deb not found in ~/Downloads."
+       if [ ! -f "$deb_path" ]; then
+         echo "ERROR: $deb not found in $path."
          exit 1
        fi
 
        # 2) install keyring; if deps are missing, fix them quietly
-       if dpkg -i "$deb" >/dev/null 2>&1 || apt-get -qq -y -f install >/dev/null 2>&1; then
-         # 3) verify package is installed
+       if dpkg -i "$deb_path" >/dev/null 2>&1 || apt-get -qq -y -f install >/dev/null 2>&1; then
+         # 3) verify packge is installed
          if dpkg -s cuda-keyring >/dev/null 2>&1; then
            # optional: refresh apt so next steps see NVIDIA repo
            apt-get -qq update >/dev/null 2>&1 || true
@@ -97,50 +101,42 @@ following hardware, software, and tools available.
        fi
      #+END_SRC
 
+     #+RESULTS:
+     : cuda-keyring installed successfully (repo: cuda-ubuntu2204-x86_64.list)
+
+
   3. Install ~sdkmanager~
 
-     #+BEGIN_SRC shell :results output :exports both :dir /sudo::~/Downloads/
+     #+BEGIN_SRC shell :results output replace :exports both :dir /sudo::
        export DEBIAN_FRONTEND=noninteractive
 
        # try to install quietly (no apt spam)
        if apt-get -qq update >/dev/null 2>&1 \
           && apt-get -qq -y install sdkmanager >/dev/null 2>&1; then
-         # double-check it’s on PATH and show version
-         if command -v sdkmanager >/dev/null 2>&1; then
-           echo "sdkmanager installed successfully ($(sdkmanager --version 2>/dev/null || echo version unknown))"
-         else
-           echo "sdkmanager installation completed, but executable not found on PATH."
-           exit 1
-         fi
+         echo "sdkmanager installed successfully"
        else
          echo "sdkmanager installation failed. See /var/log/apt/history.log for details."
          exit 1
        fi
      #+END_SRC
 
-- *Dependencies for SDK Manager:*
-  - Ensure your Ubuntu system has the necessary dependencies
-    installed. SDK Manager usually prompts for these during
-    installation, but it's good to be aware. Common dependencies might
-    include:
-    - ~curl~
-    - ~wget~
-    - ~python3~
-    - ~python3-pip~
-    - ~rsync~
-    - ~unzip~
-    - ~zip~
-    - You might need to enable the ~universe~ repository on your Ubuntu
-      system if you haven't already:
-      ,#+BEGIN_SRC sh
-        sudo add-apt-repository universe
-        sudo apt update
-    #+END_SRC
-- *Specific Python and pip versions:* SDK Manager might have specific
-  requirements for Python and pip versions. It's generally recommended
-  to use the versions that come with a recent stable Ubuntu
-  release. If you encounter issues, consult the NVIDIA SDK Manager
-  documentation for version compatibility.
+     #+RESULTS:
+     : sdkmanager installed successfully
+
+  4. Check sanity of ~sdkmanager~
+
+     #+BEGIN_SRC shell :results output replace :exports both
+       # double-check it’s on PATH and show version
+       if command -v sdkmanager >/dev/null 2>&1; then
+         echo "sdkmanager version ($(sdkmanager --ver 2>/dev/null || echo version unknown))"
+       else
+         echo "sdkmanager not found on PATH."
+         exit 1
+       fi
+     #+END_SRC
+
+     #+RESULTS:
+     : sdkmanager version (2.3.0.12617)
 
 * Tools
 
