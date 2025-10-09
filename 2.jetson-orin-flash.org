@@ -23,6 +23,57 @@ Before starting the flashing process, ensure the following:
     [[./images/recovery-button.png]]
 - *Power Supply:* Have the correct power supply for your F2 carrier board ready to be connected after the module is in Force Recovery Mode.
 
+* Setting up cross-compilation tool
+
+1. Create install directory for tools
+
+   #+BEGIN_SRC shell
+     mkdir -p ~/tools/bootlin-toolchain-gcc-93
+   #+END_SRC
+
+   #+RESULTS:
+
+2. Download Bootlin Toolchain ~gcc~.
+   
+   #+BEGIN_SRC shell :dir ~/Downloads
+     wget https://developer.nvidia.com/embedded/jetson-linux/bootlin-toolchain-gcc-93
+   #+END_SRC
+
+   #+RESULTS:
+
+3. Uncompress the cross compilation tools.
+
+   #+BEGIN_SRC shell
+     tar zxvf ~/Downloads/bootlin-toolchain-gcc-93 -C ~/tools/bootlin-toolchain-gcc-93
+   #+END_SRC
+
+   #+RESULTS:
+
+* Downloading  NVIDIA Jetson Linux 35.4.1 source code
+
+1. Create the conatiner directory.
+
+   #+BEGIN_SRC shell
+     mkdir -p ~/projects/nvidia/nvidia_sdk/public_sources/
+   #+END_SRC
+
+2. Download Driver Package (BSP) Source.
+
+   #+BEGIN_SRC shell :dir ~/Downloads
+     wget https://developer.nvidia.com/downloads/embedded/l4t/r35_release_v4.1/sources/public_sources.tbz2
+   #+END_SRC
+
+3. Download Sample Root Filesystem Source
+   #+BEGIN_SRC shell :dir ~/Downloads
+     wget https://developer.nvidia.com/downloads/embedded/l4t/r35_release_v4.1/sources/ubuntu_focal-l4t_aarch64_src.tbz2
+   #+END_SRC
+
+4. Uncompress files
+
+   #+BEGIN_SRC shell
+     tar zxvf ~/Downloads/public_sources.tbz2 -C ~/projects/nvidia/nvidia_sdk/public_sources
+   #+END_SRC
+
 * Downloading SDK  JetPack
 
 1. *Open NVIDIA SDK Manager:* You can usually find it in your Ubuntu application menu or by running the ~sdkmanager~ command in your terminal.
