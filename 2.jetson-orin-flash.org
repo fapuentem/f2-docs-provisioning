@@ -34,12 +34,40 @@ Before starting the flashing process, ensure the following:
    #+RESULTS:
 
 2. Download Bootlin Toolchain ~gcc~.
-   
-   #+BEGIN_SRC shell :dir ~/Downloads
-     wget https://developer.nvidia.com/embedded/jetson-linux/bootlin-toolchain-gcc-93
-   #+END_SRC
+   #+BEGIN_SRC shell :dir ~/Downloads :results output replace :exports both
+     set -u
+
+     URL="https://developer.nvidia.com/embedded/jetson-linux/bootlin-toolchain-gcc-93"
+     BASE=${URL##*/}
+     echo "Downloading tar ball into $(pwd)..."
+     # Remove any previous downloads that match this name pattern
+     rm -f bootlin-toolchain-gcc-93* 2>/dev/null || true
+
+     # Use Content-Disposition/redirect name if the server provides it
+     if wget --quiet "$URL"; then
+       NEWFILE="$(ls -t $BASE 2>/dev/null | head -n1 || true)"
+       if [ -n "${NEWFILE:-}" ] && [ -s "$NEWFILE" ]; then
+         # Get file size in bytes (portable-ish)
+         if command -v stat >/dev/null 2>&1; then
+           BYTES=$(stat -c%s "$NEWFILE" 2>/dev/null || stat -f%z "$NEWFILE" 2>/dev/null || wc -c < "$NEWFILE")
+         else
+           BYTES=$(wc -c < "$NEWFILE")
+         fi
+         echo "✅ Download succeeded: '$NEWFILE' (${BYTES} bytes)."
+         exit 0
+       else
+         echo "❌ Download reported success, but file missing or empty."
+         exit 2
+       fi
+     else
+       echo "❌ Download failed from: $URL"
+       exit 1
+     fi
+  #+END_SRC
 
    #+RESULTS:
+   : Downloading Bootlin toolchain into /home/fabricio/Downloads...
+   : ✅ Download succeeded: 'bootlin-toolchain-gcc-93' (96510772 bytes).
 
 3. Uncompress the cross compilation tools.
 
@@ -54,26 +82,114 @@ Before starting the flashing process, ensure the following:
 1. Create the conatiner directory.
 
    #+BEGIN_SRC shell
-     mkdir -p ~/projects/nvidia/nvidia_sdk/public_sources/
+     mkdir -p ~/projects/nvidia/nvidia_sdk/JetPack_5.1.2_Linux_JETSON_ORIN_NX_TARGETS/
    #+END_SRC
 
 2. Download Driver Package (BSP) Source.
 
-   #+BEGIN_SRC shell :dir ~/Downloads
-     wget https://developer.nvidia.com/downloads/embedded/l4t/r35_release_v4.1/sources/public_sources.tbz2
-   #+END_SRC
+   #+BEGIN_SRC shell :dir ~/Downloads :results output replace :exports both
+     set -u
+     URL="https://developer.nvidia.com/downloads/embedded/l4t/r35_release_v4.1/sources/public_sources.tbz2"
+     BASE=${URL##*/}
+     echo "Downloading tar ball into $(pwd)..."
+     # Remove any previous downloads that match this name pattern
+     rm -f bootlin-toolchain-gcc-93* 2>/dev/null || true
+
+     # Use Content-Disposition/redirect name if the server provides it
+     if wget --quiet "$URL"; then
+       NEWFILE="$(ls -t $BASE 2>/dev/null | head -n1 || true)"
+       if [ -n "${NEWFILE:-}" ] && [ -s "$NEWFILE" ]; then
+         # Get file size in bytes (portable-ish)
+         if command -v stat >/dev/null 2>&1; then
+           BYTES=$(stat -c%s "$NEWFILE" 2>/dev/null || stat -f%z "$NEWFILE" 2>/dev/null || wc -c < "$NEWFILE")
+         else
+           BYTES=$(wc -c < "$NEWFILE")
+         fi
+         echo "✅ Download succeeded: '$NEWFILE' (${BYTES} bytes)."
+         exit 0
+       else
+         echo "❌ Download reported success, but file missing or empty."
+         exit 2
+       fi
+     else
+       echo "❌ Download failed from: $URL"
+       exit 1
+     fi
+  #+END_SRC
+
+  #+RESULTS:
+  : Downloading Bootlin toolchain into /home/fabricio/Music...
+  : ✅ Download succeeded: 'public_sources.tbz2' (193808816 bytes).
 
 3. Download Sample Root Filesystem Source
-   #+BEGIN_SRC shell :dir ~/Downloads
+   #+BEGIN_SRC shell :dir ~/Downloads :results output replace :exports both
+     set -u
+     URL="https://developer.nvidia.com/downloads/embedded/l4t/r35_release_v4.1/sources/ubuntu_focal-l4t_aarch64_src.tbz2"
+     BASE=${URL##*/}
+     echo "Downloading tar ball into $(pwd)..."
+     # Remove any previous downloads that match this name pattern
+     rm -f bootlin-toolchain-gcc-93* 2>/dev/null || true
+
+     # Use Content-Disposition/redirect name if the server provides it
+     if wget --quiet "$URL"; then
+       NEWFILE="$(ls -t $BASE 2>/dev/null | head -n1 || true)"
+       if [ -n "${NEWFILE:-}" ] && [ -s "$NEWFILE" ]; then
+         # Get file size in bytes (portable-ish)
+         if command -v stat >/dev/null 2>&1; then
+           BYTES=$(stat -c%s "$NEWFILE" 2>/dev/null || stat -f%z "$NEWFILE" 2>/dev/null || wc -c < "$NEWFILE")
+         else
+           BYTES=$(wc -c < "$NEWFILE")
+         fi
+         echo "✅ Download succeeded: '$NEWFILE' (${BYTES} bytes)."
+         exit 0
+       else
+         echo "❌ Download reported success, but file missing or empty."
+         exit 2
+       fi
+     else
+       echo "❌ Download failed from: $URL"
+       exit 1
+     fi
+  #+END_SRC
+
+     #+BEGIN_SRC shell :dir ~/Downloads
      wget https://developer.nvidia.com/downloads/embedded/l4t/r35_release_v4.1/sources/ubuntu_focal-l4t_aarch64_src.tbz2
    #+END_SRC
 
 4. Uncompress files
 
    #+BEGIN_SRC shell
-     tar zxvf ~/Downloads/public_sources.tbz2 -C ~/projects/nvidia/nvidia_sdk/public_sources
+     tar xvf ~/Downloads/public_sources.tbz2 -C ~/projects/nvidia/nvidia_sdk/JetPack_5.1.2_Linux_JETSON_ORIN_NX_TARGETS
    #+END_SRC
 
+* Install host build dependencies (Ubuntu/Debian)
+
+#+BEGIN_SRC shell :dir /sudo::
+  sudo apt-get update
+  sudo apt-get install -y \
+       build-essential bc bison flex \
+       libssl-dev libelf-dev \
+       dwarves device-tree-compiler \
+       libncurses5-dev libncursesw5-dev \
+       rsync cpio
+#+END_SRC
+
+Notes:
+
+- ~flex/bison~ are needed for Kconfig and headers.
+- ~libssl-dev/libelf-dev~ are common kernel deps.
+- ~dwarves~ provides pahole (some configs require it).
+- ~device-tree-compiler~ is handy for checking DTs on the target.
+
+* Run config and build DTS 
+1. Uncompress kernel source code
+
+     #+BEGIN_SRC shell :dir ~/projects/nvidia/nvidia_sdk/JetPack_5.1.2_Linux_JETSON_ORIN_NX_TARGETS/Linux_for_Tegra_source/public
+       tar xvf ./kernel_src.tbz2 -C ./kernel_src
+   #+END_SRC
+
+2. xD
+   
 * Downloading SDK  JetPack
 
 1. *Open NVIDIA SDK Manager:* You can usually find it in your Ubuntu application menu or by running the ~sdkmanager~ command in your terminal.
@@ -90,35 +206,34 @@ Before starting the flashing process, ensure the following:
 * Flashing Procedure (using SDK Manager)
 
 1. *Select Components:* In the "Details and License" step, you will see various options for SDK components.
-   
+
    - For a basic flash, ensure that the *Jetson Linux* and *Jetson Runtime* are selected. You can deselect other components like CUDA, cuDNN, TensorRT, etc., if you only want to flash the base operating system initially. You can install these later if needed.
-     
+
    - Carefully review the selected components and their versions.
 
    -  [[https://docs.nvidia.com/jetson/archives/r35.3.1/DeveloperGuide/text/HR/JetsonModuleAdaptationAndBringUp/JetsonOrinNxNanoSeries.html#eeprom-modifications][EPROM modifications]].
-     
+
 2. *Review Licenses:* Accept the necessary licenses by checking the "I accept the terms and conditions" boxes.
    [[./images/sdkmanager-step2.png]]
+
 3. *Initiate Flashing:* Click on the "Continue" button to begin the download and flashing process.
    In the "Recovery mode setup" choose "Manual Setup", and in item 8 use a default password *nvidia* and user *nvidia*.
    [[./images/recovery-preconfig.png]]
-4. *Put Jetson Orin into Force Recovery Mode:* SDK Manager will guide you through the steps to put your Jetson Orin module into Force Recovery Mode. This typically involves the following sequence:
 
+4. *Put Jetson Orin into Force Recovery Mode:* SDK Manager will guide you through the steps to put your Jetson Orin module into Force Recovery Mode. This typically involves the following sequence:
    a. *Ensure the F2 carrier board is powered OFF.*
-   
    b. *Connect the USB cable* from your host computer to the designated USB port on the F2 carrier board (refer to your carrier board's documentation for the correct port (RECOVERY connector), often a USB Type-C or Micro-USB port labeled for flashing).
-   
    c. *Press and hold the Recovery Button* on the F2 carrier board.
-   
    d. *While still holding the Recovery Button, briefly press and release the Power Button* on the F2 carrier board.
-   
    e. *Release the Recovery Button.*
-   
    f. *Power ON the F2 carrier board* (if it didn't power on automatically).
-   
+
 5. *SDK Manager Detection:* SDK Manager should now detect your Jetson Orin module in Force Recovery Mode. If it doesn't, refer to the [[file:2.jetson-orin-flash.org::*Troubleshooting Flashing Issues][Troubleshooting Flashing Issues]] section.
+
 6. *Flashing Begins:* Once the module is detected, SDK Manager will automatically start downloading the necessary files and flashing the operating system onto the Jetson Orin module. This process can take a significant amount of time depending on your internet speed and system resources.
+
 7. *Monitor the Progress:* Keep an eye on the SDK Manager window for progress updates and any error messages.
+
 8. *Flashing Complete:* Once the process is finished successfully, SDK Manager will display a "Flash Successful" message. You can now disconnect the USB cable and power cycle your Jetson Orin module on the F2 carrier board. It should boot into the newly flashed operating system.
 
 * Flashing Procedure (using JetPack CLI)
