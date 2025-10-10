@@ -152,10 +152,6 @@ Before starting the flashing process, ensure the following:
      fi
   #+END_SRC
 
-     #+BEGIN_SRC shell :dir ~/Downloads
-     wget https://developer.nvidia.com/downloads/embedded/l4t/r35_release_v4.1/sources/ubuntu_focal-l4t_aarch64_src.tbz2
-   #+END_SRC
-
 4. Uncompress files
 
    #+BEGIN_SRC shell
@@ -184,16 +180,53 @@ Notes:
 * Run config and build DTS 
 1. Uncompress kernel source code
 
-     #+BEGIN_SRC shell :dir ~/projects/nvidia/nvidia_sdk/JetPack_5.1.2_Linux_JETSON_ORIN_NX_TARGETS/Linux_for_Tegra/source/public
-       mkdir -p ./kernel_src
-       tar xvf ./kernel_src.tbz2 -C ./kernel_src
+   #+BEGIN_SRC shell :dir ~/projects/nvidia/nvidia_sdk/JetPack_5.1.2_Linux_JETSON_ORIN_NX_TARGETS/Linux_for_Tegra/source/public
+     mkdir -p ./kernel_src
+     tar xvf ./kernel_src.tbz2 -C ./kernel_src
    #+END_SRC
 
-2. xD
-   
+2. Build DTB
+
+    #+NAME : build-dtbs
+   #+BEGIN_SRC shell :results output replace :exports both \
+     :dir ~/projects/nvidia/nvidia_sdk/public_sources/Linux_for_Tegra/source/public/kernel_src/kernel/kernel-5.10 \
+     :var cross="/home/india/tools/bootlin-toolchain-gcc-93/bin/aarch64-buildroot-linux-gnu-" \
+     :var dtb_target="dtbs"
+
+     set -euo pipefail
+
+     echo "== ENV =="
+     export ARCH=arm64
+     export CROSS_COMPILE="$cross"
+     OUT=../../build
+     echo "ARCH=$ARCH"
+     echo "CROSS_COMPILE=$CROSS_COMPILE"
+     echo "OUT=$OUT"
+     mkdir -p "$OUT"
+
+     echo
+     echo "== Generating .config =="
+     make O="$OUT" tegra_defconfig
+
+     echo
+     echo "== Building target: $dtb_target =="
+     # dtb_target can be "dtbs" or a specific file like tegra234-...a1.dtb
+     make -j"$(nproc)" O="$OUT" "$dtb_target"
+
+     echo
+     echo "== Artifacts (top 20) =="
+     ls -1 "$OUT/arch/arm64/boot/dts/nvidia/" | head -n 20
+
+     echo
+     echo "Done."
+#+END_SRC
+
+3. Copy the rebuilt DTB to your Jetson
+
+
 * Downloading SDK  JetPack
 
-1. *Open NVIDIA SDK Manager:* You can usually find it in your Ubuntu application menu or by running the ~sdkmanager~ command in your terminal.
+1. *Open NVIDIA SDK Manager:* You can usually find it in your Ubuntu application menu or by running the ~sdkmanager --archived-versions~ command in your terminal.
 2. *Log in:* Enter your NVIDIA Developer account credentials.
 3. *Select Target Hardware:*
    - In the "Product Category" block, choose the *Jetson* family.

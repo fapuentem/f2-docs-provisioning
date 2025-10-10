@@ -55,14 +55,39 @@ following hardware, software, and tools available.
 
      #+BEGIN_SRC shell :dir ~/Downloads :results output
        # Compute NVIDIA's token: ubuntu1804 / 2004 / 2204 / 2404
+       set -u
        distro=$( . /etc/os-release; printf "ubuntu%s" "${VERSION_ID//./}" )
+       URL="https://developer.download.nvidia.com/compute/cuda/repos/${distro}/x86_64/cuda-keyring_1.1-1_all.deb"
+        BASE=${URL##*/}
+        echo "Downloading tar ball into $(pwd)..."
+        # Remove any previous downloads that match this name pattern
+        rm -f bootlin-toolchain-gcc-93* 2>/dev/null || true
 
-       echo "Using distro: $distro"
-       wget "https://developer.download.nvidia.com/compute/cuda/repos/${distro}/x86_64/cuda-keyring_1.1-1_all.deb"
+        # Use Content-Disposition/redirect name if the server provides it
+        if wget --quiet "$URL"; then
+          NEWFILE="$(ls -t $BASE 2>/dev/null | head -n1 || true)"
+          if [ -n "${NEWFILE:-}" ] && [ -s "$NEWFILE" ]; then
+            # Get file size in bytes (portable-ish)
+            if command -v stat >/dev/null 2>&1; then
+              BYTES=$(stat -c%s "$NEWFILE" 2>/dev/null || stat -f%z "$NEWFILE" 2>/dev/null || wc -c < "$NEWFILE")
+            else
+              BYTES=$(wc -c < "$NEWFILE")
+            fi
+            echo "✅ Download succeeded: '$NEWFILE' (${BYTES} bytes)."
+            exit 0
+          else
+            echo "❌ Download reported success, but file missing or empty."
+            exit 2
+          fi
+        else
+          echo "❌ Download failed from: $URL"
+          exit 1
+        fi
      #+END_SRC
 
      #+RESULTS:
-     : Using distro: ubuntu2204
+     : Downloading tar ball into /home/fabricio/Downloads...
+     : ✅ Download succeeded: 'cuda-keyring_1.1-1_all.deb' (4332 bytes).
 
   2. Install ~.deb~ package
 
