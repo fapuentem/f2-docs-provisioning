@@ -80,8 +80,6 @@ Before starting the flashing process, ensure the following:
      GLOB="bootlin-toolchain-gcc-93*"
      DEST="$HOME/tools/bootlin-toolchain-gcc-93"
 
-     echo "Uncompressing cross-compile toolchain…"
-
      # Find newest matching tarball
      SRC="$(ls -t "$DL_DIR"/$GLOB 2>/dev/null | head -n1 || true)"
      if [ -z "${SRC:-}" ] || [ ! -f "$SRC" ]; then
@@ -211,8 +209,6 @@ Before starting the flashing process, ensure the following:
      GLOB="public_sources*"
      DEST="$HOME/projects/nvidia/nvidia_sdk/JetPack_5.1.2_Linux_JETSON_ORIN_NX_TARGETS"
 
-     echo "Uncompressing cross-compile toolchain…"
-
      # Find newest matching tarball
      SRC="$(ls -t "$DL_DIR"/$GLOB 2>/dev/null | head -n1 || true)"
      if [ -z "${SRC:-}" ] || [ ! -f "$SRC" ]; then
@@ -285,8 +281,6 @@ Notes:
      DL_DIR="$HOME/projects/nvidia/nvidia_sdk/JetPack_5.1.2_Linux_JETSON_ORIN_NX_TARGETS/Linux_for_Tegra/source/public"
      GLOB="/kernel_src*"
      DEST="$HOME/projects/nvidia/nvidia_sdk/JetPack_5.1.2_Linux_JETSON_ORIN_NX_TARGETS/Linux_for_Tegra/source/public/kernel_src"
-
-     echo "Uncompressing cross-compile toolchain…"
 
      # Find newest matching tarball
      SRC="$(ls -t "$DL_DIR"/$GLOB 2>/dev/null | head -n1 || true)"
