@@ -5,8 +5,7 @@
 #+EXCLUDE_TAGS: noexport
 #+OPTIONS: email:t toc:nil num:nil
 
-Before starting the provisioning process, ensure you have the
-following hardware, software, and tools available.
+Before starting the provisioning process, ensure you have the following hardware, software, and tools available.
 
 * Hardware Requirements
 
@@ -45,7 +44,7 @@ following hardware, software, and tools available.
 - Install requirements
 
   #+BEGIN_SRC shell :results none :exports code :dir /sudo::
-    apt install git htop
+    apt install git
  #+END_SRC
 
 - *NVIDIA SDK Manager:* Download and install the latest version of
@@ -176,6 +175,7 @@ following hardware, software, and tools available.
 - *Screwdriver Set (if assembly is required):* Depending on your carrier
   board and Jetson module, you might need a screwdriver to secure the
   module or install storage.
+
 - *ESD Protection (Wrist Strap):* Highly recommended to prevent
   electrostatic discharge that could damage sensitive electronic
   components during handling.

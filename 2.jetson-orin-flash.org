@@ -5,7 +5,9 @@
 #+EXCLUDE_TAGS: noexport debian
 #+OPTIONS: email:t toc:nil num:nil
 
-This section details the process of flashing the operating system onto your Jetson Orin module using the NVIDIA SDK Manager on an Ubuntu host machine.
+This section details the process of flashing the operating system onto
+your Jetson Orin module using the NVIDIA SDK Manager on an Ubuntu host
+machine.
 
 * Preparation
 
@@ -122,6 +124,8 @@ Before starting the flashing process, ensure the following:
 
 * Downloading  NVIDIA Jetson Linux 35.4.1 source code
 
+Reference: https://developer.nvidia.com/embedded/jetson-linux-r3541
+
 1. Create the conatiner directory.
 
    #+BEGIN_SRC shell :results none
@@ -165,6 +169,7 @@ Before starting the flashing process, ensure the following:
   : ✅ Download succeeded: 'public_sources.tbz2' (193808816 bytes).
 
 3. Download Sample Root Filesystem Source
+
    #+BEGIN_SRC shell :dir ~/Downloads :results output replace :exports both
      set -u
      URL="https://developer.nvidia.com/downloads/embedded/l4t/r35_release_v4.1/sources/ubuntu_focal-l4t_aarch64_src.tbz2"
@@ -471,5 +476,3 @@ Here are some common issues that might occur during the flashing process and pot
 - *Carrier Board Specific Issues:* Consult the documentation for your F2 custom carrier board for any specific flashing instructions or known issues.
 
 If you continue to experience problems, carefully review the NVIDIA SDK Manager documentation and the documentation for your F2 carrier board for more detailed troubleshooting steps.
-
-

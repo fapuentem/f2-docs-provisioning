@@ -7,11 +7,11 @@
 
 * README :noexport:
 This is a literate document that can potentially execute code on your computer! It's about how to
-build Emacs on Debian and Redhat machines.
+build flash environment for NVIDIA Jetson Orin NX device.
 
 * Document constants :noexport:
 :PROPERTIES:
-:deb_distro: Debian
+:deb_distro: Ubuntu
 :END:
 
 * Code :noexport:
@@ -22,48 +22,55 @@ build Emacs on Debian and Redhat machines.
     (org-babel-do-load-languages
      'org-babel-load-languages
      '((shell . t)))
-#+end_src
+#+END_SRC
 
-* Introduction
+* Purpose
 
-This document provides a comprehensive guide for provisioning a Jetson
-Orin module on F2 carrier boards(v3.x). It outlines the necessary
-steps to flash the operating system, perform initial system
-configuration, set up networking, install essential software, and
-configure any carrier board-specific functionalities.
+This documentation set provides step-by-step instructions to prepare an Ubuntu host system, install the required tools, and flash the *F2 Smart Controller* (F2-SC01) based on the NVIDIA Jetson Orin NX module.
+
+Each section is contained in a separate =.org= file to simplify navigation and maintenance.  The instructions are validated on Ubuntu 18.04 host systems.
+
+* Scope
+
+These documents focus on Visiontech’s in-house carrier board design.  The *F2-Smart-Controller* hardware integrates:
+
+- Jetson Orin NX module (8GB or 16GB)
+- Custom power and I/O management circuits
+- Dual GbE, USB, and expansion connectors
+- NVMe SSD and eMMC boot options
+
+* Schematics for reference:
+
+- [[https://drive.google.com/file/d/10jONNyTHOUDIAe2lZ7bDTrrt8dm2TLln/view?usp=drive_link][F2SC01 v3.1.1 – Electrical Schematic]]
+- [[https://drive.google.com/file/d/1P-O4XCeYHGqBCgibLECSdy-e4ZpldYVV/view?usp=drive_link][Top render]]
+- [[https://drive.google.com/file/d/1VmqzYZc3c1TnbQRANAWLH3arrPK2rPAd/view?usp=drive_link][Bottom render]]
 
 * Target Audience
 
 This documentation is primarily intended for:
 
-- Developers working with the Jetson Orin platform.
-- Engineers responsible for setting up and deploying Jetson Orin based
-  systems.
-- Technicians involved in the initial configuration and testing of the
-  hardware.
+- Developers working with the *F2-Smart-Controller* platform.
+- Engineers responsible for setting up and deploying *F2-Smart-Controller*.
+- Technicians involved in the initial configuration and testing of the hardware.
 
-A basic understanding of Linux command-line operations and embedded
-systems concepts is recommended.
+A basic understanding of Linux command-line operations and embedded systems concepts is recommended.
 
 * Document Conventions
 
 The following conventions are used throughout this document:
 
-- *Code Blocks:* Commands to be executed in the terminal are displayed
-  within ~src~ blocks:
+- *Code Blocks:* Commands to be executed in the terminal are displayed within ~src~ blocks:
   #+BEGIN_SRC sh
   sudo apt update
   #+END_SRC
 
-- *Important Notes:* Important information or considerations are
-  highlighted as follows:
+- *Important Notes:* Important information or considerations are highlighted as follows:
   #+BEGIN_QUOTE
   *IMPORTANT:* Ensure you have the correct power supply connected before
    proceeding.
   #+END_QUOTE
 
-- *Warnings:* Steps that could potentially lead to data loss or system
-  instability are marked with a warning:
+- *Warnings:* Steps that could potentially lead to data loss or system instability are marked with a warning:
   #+BEGIN_QUOTE
   *WARNING:* Incorrectly flashing the module can render it
    unusable. Double-check all steps before execution.
@@ -82,10 +89,9 @@ The following conventions are used throughout this document:
 
 #+TOC: headlines 2
 
-* Quick Start Guide (Optional)
+* Quick Start Guide
 
-For experienced users familiar with Jetson Orin provisioning, here's a
-brief overview of the main steps:
+For experienced users familiar with Jetson Orin provisioning, here's a brief overview of the main steps:
 
 1. [[file:1.prerequisites.org][Gather necessary hardware and software.]]
 2. [[file:2.jetson-orin-flash.org][Flash the Jetson Orin module using SDK Manager or JetPack CLI.]]
@@ -96,6 +102,17 @@ brief overview of the main steps:
 7. [[file:7.testing-and-validation.org][Test and validate the system functionality.]]
 
 Refer to the respective sections for detailed instructions.
+
+* Notes
+- All shell commands are intended to be executed on the Ubuntu host unless otherwise noted.
+- The instructions were verified against F2SC01 v3.1.1 hardware.
+- Keep all related =.org= files in the same directory to preserve link integrity.
+
+* Revision History
+
+| Version |       Date | Description                       |
+|---------+------------+-----------------------------------|
+|     1.0 | 2025-10-10 | Initial release for F2SC01 v3.1.1 |
 
 # Local Variables:
 # org-confirm-babel-evaluate: (lambda (lang body) (not (string= lang "elisp")))
