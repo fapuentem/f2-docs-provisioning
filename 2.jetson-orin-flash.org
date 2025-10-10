@@ -118,8 +118,7 @@ Before starting the flashing process, ensure the following:
    #+END_SRC
 
    #+RESULTS:
-   : Uncompressing cross-compile toolchain…
-   : ✅ Extracted bootlin-toolchain-gcc-93 into '/home/fabricio/Music/tools/bootlin-toolchain-gcc-93' (4547 files).
+   : ✅ Extracted bootlin-toolchain-gcc-93 into '/home/fabricio/tools/bootlin-toolchain-gcc-93' (4547 files).
 
 * Downloading  NVIDIA Jetson Linux 35.4.1 source code
 
@@ -247,7 +246,6 @@ Before starting the flashing process, ensure the following:
    #+END_SRC
 
    #+RESULTS:
-   : Uncompressing cross-compile toolchain…
    : ✅ Extracted public_sources.tbz2 into '/home/fabricio/projects/nvidia/nvidia_sdk/JetPack_5.1.2_Linux_JETSON_ORIN_NX_TARGETS' (63 files).
 
 * Install host build dependencies (Ubuntu/Debian)
@@ -320,7 +318,6 @@ Notes:
    #+END_SRC
 
    #+RESULTS:
-   : Uncompressing cross-compile toolchain…
    : ✅ Extracted kernel_src.tbz2 into '/home/fabricio/projects/nvidia/nvidia_sdk/JetPack_5.1.2_Linux_JETSON_ORIN_NX_TARGETS/Linux_for_Tegra/source/public/kernel_src' (81613 files).
 
 2. Build DTB
@@ -360,7 +357,7 @@ Notes:
 
 3. Copy the rebuilt DTB to your Jetson
 
-* Fixing USB port conflicts in Ubuntu
+* Fixing USB port conflicts in Ubuntu 18.04
 
 1. Swap the cable & port.
 2. Use a short, data-capable USB-C cable (ideally the NVIDIA devkit cable).
@@ -375,7 +372,7 @@ Notes:
 6. On host:
 
    #+BEGIN_SRC shell
-     lsusb | grep -i NVidia
+     lsusb | grep -i nvidia
    #+END_SRC
    You should see ~Bus 003 Device 073: ID 0955:7423 NVidia Corp.~ If not, you’re not in recovery (RCM).
 
