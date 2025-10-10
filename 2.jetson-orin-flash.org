@@ -41,7 +41,7 @@ Before starting the flashing process, ensure the following:
      BASE=${URL##*/}
      echo "Downloading tar ball into $(pwd)..."
      # Remove any previous downloads that match this name pattern
-     rm -f bootlin-toolchain-gcc-93* 2>/dev/null || true
+     rm -f "$BASE" 2>/dev/null || true
 
      # Use Content-Disposition/redirect name if the server provides it
      if wget --quiet "$URL"; then
@@ -127,7 +127,7 @@ Before starting the flashing process, ensure the following:
 
 1. Create the conatiner directory.
 
-   #+BEGIN_SRC shell
+   #+BEGIN_SRC shell :results none
      mkdir -p ~/projects/nvidia/nvidia_sdk/JetPack_5.1.2_Linux_JETSON_ORIN_NX_TARGETS/
    #+END_SRC
 
@@ -139,7 +139,7 @@ Before starting the flashing process, ensure the following:
      BASE=${URL##*/}
      echo "Downloading tar ball into $(pwd)..."
      # Remove any previous downloads that match this name pattern
-     rm -f bootlin-toolchain-gcc-93* 2>/dev/null || true
+     rm -f "$BASE" 2>/dev/null || true
 
      # Use Content-Disposition/redirect name if the server provides it
      if wget --quiet "$URL"; then
@@ -174,7 +174,7 @@ Before starting the flashing process, ensure the following:
      BASE=${URL##*/}
      echo "Downloading tar ball into $(pwd)..."
      # Remove any previous downloads that match this name pattern
-     rm -f bootlin-toolchain-gcc-93* 2>/dev/null || true
+     rm -f "$BASE" 2>/dev/null || true
 
      # Use Content-Disposition/redirect name if the server provides it
      if wget --quiet "$URL"; then
