@@ -90,7 +90,7 @@ following hardware, software, and tools available.
      : ✅ Download succeeded: 'cuda-keyring_1.1-1_all.deb' (4332 bytes).
 
   2. Install ~.deb~ package
-     #+NAME: get_home
+     #+NAME: get_home :export none
      #+BEGIN_SRC shell :results output :exports none
        printf %s "$HOME"
      #+END_SRC

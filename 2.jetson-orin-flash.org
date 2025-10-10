@@ -27,7 +27,7 @@ Before starting the flashing process, ensure the following:
 
 1. Create install directory for tools
 
-   #+BEGIN_SRC shell
+   #+BEGIN_SRC shell :exports code :output none
      mkdir -p ~/tools/bootlin-toolchain-gcc-93
    #+END_SRC
 
@@ -66,16 +66,62 @@ Before starting the flashing process, ensure the following:
   #+END_SRC
 
    #+RESULTS:
-   : Downloading Bootlin toolchain into /home/fabricio/Downloads...
+   : Downloading tar ball into /home/fabricio/Downloads...
    : ✅ Download succeeded: 'bootlin-toolchain-gcc-93' (96510772 bytes).
 
 3. Uncompress the cross compilation tools.
 
-   #+BEGIN_SRC shell
-     tar zxvf ~/Downloads/bootlin-toolchain-gcc-93 -C ~/tools/bootlin-toolchain-gcc-93
+   #+BEGIN_SRC shell :results output replace :exports both
+     # tar zxvf ~/Downloads/bootlin-toolchain-gcc-93 -C ~/tools/bootlin-toolchain-gcc-93
+     set -euo pipefail
+
+     # Where to find / place things
+     DL_DIR="$HOME/Downloads"
+     GLOB="bootlin-toolchain-gcc-93*"
+     DEST="$HOME/tools/bootlin-toolchain-gcc-93"
+
+     echo "Uncompressing cross-compile toolchain…"
+
+     # Find newest matching tarball
+     SRC="$(ls -t "$DL_DIR"/$GLOB 2>/dev/null | head -n1 || true)"
+     if [ -z "${SRC:-}" ] || [ ! -f "$SRC" ]; then
+       echo "❌ No tarball found matching $DL_DIR/$GLOB"
+       exit 1
+     fi
+
+     # Quick sanity: verify it's a tar archive we can list
+     if ! tar -tf "$SRC" >/dev/null 2>&1; then
+       echo "❌ '$SRC' does not look like a valid tar archive."
+       exit 2
+     fi
+
+     # Replace destination
+     rm -rf "$DEST"
+     mkdir -p "$DEST"
+
+     # Pick decompression flag based on extension (xz/gz/bz2/none)
+     case "$SRC" in
+       ,*.tar.xz|*.txz)  DFLAG="J" ;;
+       ,*.tar.gz|*.tgz)  DFLAG="z" ;;
+       ,*.tar.bz2|*.tbz2) DFLAG="j" ;;
+       ,*.tar)           DFLAG=""  ;;
+       ,*)               DFLAG=""  ;;
+     esac
+
+     # Extract quietly into DEST
+     if ! tar -x${DFLAG}f "$SRC" -C "$DEST" --warning=no-unknown-keyword; then
+       echo "❌ Extraction failed."
+       exit 3
+     fi
+
+     # Simple success summary
+     FILES=$(find "$DEST" -type f | wc -l | tr -d ' ')
+     echo "✅ Extracted $(basename "$SRC") into '$DEST' ($FILES files)."
    #+END_SRC
 
    #+RESULTS:
+   : Uncompressing cross-compile toolchain…
+   : ✅ Extracted bootlin-toolchain-gcc-93 into '/home/fabricio/Music/tools/bootlin-toolchain-gcc-93' (4547 files).
 
 * Downloading  NVIDIA Jetson Linux 35.4.1 source code
 
@@ -118,7 +164,7 @@ Before starting the flashing process, ensure the following:
   #+END_SRC
 
   #+RESULTS:
-  : Downloading Bootlin toolchain into /home/fabricio/Music...
+  : Downloading tar ball into /home/fabricio/Downloads...
   : ✅ Download succeeded: 'public_sources.tbz2' (193808816 bytes).
 
 3. Download Sample Root Filesystem Source
@@ -153,14 +199,64 @@ Before starting the flashing process, ensure the following:
   #+END_SRC
 
 4. Uncompress files
+   
+   #+BEGIN_SRC shell :results output replace :exports both
+     # tar zxvf ~/Downloads/bootlin-toolchain-gcc-93 -C ~/tools/bootlin-toolchain-gcc-93
+     #      tar xvf ~/Downloads/public_sources.tbz2 -C ~/projects/nvidia/nvidia_sdk/JetPack_5.1.2_Linux_JETSON_ORIN_NX_TARGETS
 
-   #+BEGIN_SRC shell
-     tar xvf ~/Downloads/public_sources.tbz2 -C ~/projects/nvidia/nvidia_sdk/JetPack_5.1.2_Linux_JETSON_ORIN_NX_TARGETS
+     set -euo pipefail
+
+     # Where to find / place things
+     DL_DIR="$HOME/Downloads"
+     GLOB="public_sources*"
+     DEST="$HOME/projects/nvidia/nvidia_sdk/JetPack_5.1.2_Linux_JETSON_ORIN_NX_TARGETS"
+
+     echo "Uncompressing cross-compile toolchain…"
+
+     # Find newest matching tarball
+     SRC="$(ls -t "$DL_DIR"/$GLOB 2>/dev/null | head -n1 || true)"
+     if [ -z "${SRC:-}" ] || [ ! -f "$SRC" ]; then
+       echo "❌ No tarball found matching $DL_DIR/$GLOB"
+       exit 1
+     fi
+
+     # Quick sanity: verify it's a tar archive we can list
+     if ! tar -tf "$SRC" >/dev/null 2>&1; then
+       echo "❌ '$SRC' does not look like a valid tar archive."
+       exit 2
+     fi
+
+     # Replace destination
+     rm -rf "$DEST"
+     mkdir -p "$DEST"
+
+     # Pick decompression flag based on extension (xz/gz/bz2/none)
+     case "$SRC" in
+       ,*.tar.xz|*.txz)  DFLAG="J" ;;
+       ,*.tar.gz|*.tgz)  DFLAG="z" ;;
+       ,*.tar.bz2|*.tbz2) DFLAG="j" ;;
+       ,*.tar)           DFLAG=""  ;;
+       ,*)               DFLAG=""  ;;
+     esac
+
+     # Extract quietly into DEST
+     if ! tar -x${DFLAG}f "$SRC" -C "$DEST" --warning=no-unknown-keyword; then
+       echo "❌ Extraction failed."
+       exit 3
+     fi
+
+     # Simple success summary
+     FILES=$(find "$DEST" -type f | wc -l | tr -d ' ')
+     echo "✅ Extracted $(basename "$SRC") into '$DEST' ($FILES files)."
    #+END_SRC
+
+   #+RESULTS:
+   : Uncompressing cross-compile toolchain…
+   : ✅ Extracted public_sources.tbz2 into '/home/fabricio/projects/nvidia/nvidia_sdk/JetPack_5.1.2_Linux_JETSON_ORIN_NX_TARGETS' (63 files).
 
 * Install host build dependencies (Ubuntu/Debian)
 
-#+BEGIN_SRC shell :dir /sudo:: :results value :exports code
+#+BEGIN_SRC shell :dir /sudo:: :results none :exports code
   sudo apt-get update
   sudo apt-get install -y \
        build-essential bc bison flex \
@@ -180,18 +276,63 @@ Notes:
 * Run config and build DTS 
 1. Uncompress kernel source code
 
-   #+BEGIN_SRC shell :dir ~/projects/nvidia/nvidia_sdk/JetPack_5.1.2_Linux_JETSON_ORIN_NX_TARGETS/Linux_for_Tegra/source/public
-     mkdir -p ./kernel_src
-     tar xvf ./kernel_src.tbz2 -C ./kernel_src
+   #+BEGIN_SRC shell :results output replace :exports both
+     # mkdir -p ./kernel_src
+     # tar xvf ./kernel_src.tbz2 -C ./kernel_src
+     set -euo pipefail
+
+     # Where to find / place things
+     DL_DIR="$HOME/projects/nvidia/nvidia_sdk/JetPack_5.1.2_Linux_JETSON_ORIN_NX_TARGETS/Linux_for_Tegra/source/public"
+     GLOB="/kernel_src*"
+     DEST="$HOME/projects/nvidia/nvidia_sdk/JetPack_5.1.2_Linux_JETSON_ORIN_NX_TARGETS/Linux_for_Tegra/source/public/kernel_src"
+
+     echo "Uncompressing cross-compile toolchain…"
+
+     # Find newest matching tarball
+     SRC="$(ls -t "$DL_DIR"/$GLOB 2>/dev/null | head -n1 || true)"
+     if [ -z "${SRC:-}" ] || [ ! -f "$SRC" ]; then
+       echo "❌ No tarball found matching $DL_DIR/$GLOB"
+       exit 1
+     fi
+
+     # Quick sanity: verify it's a tar archive we can list
+     if ! tar -tf "$SRC" >/dev/null 2>&1; then
+       echo "❌ '$SRC' does not look like a valid tar archive."
+       exit 2
+     fi
+
+     # Replace destination
+     rm -rf "$DEST"
+     mkdir -p "$DEST"
+
+     # Pick decompression flag based on extension (xz/gz/bz2/none)
+     case "$SRC" in
+       ,*.tar.xz|*.txz)  DFLAG="J" ;;
+       ,*.tar.gz|*.tgz)  DFLAG="z" ;;
+       ,*.tar.bz2|*.tbz2) DFLAG="j" ;;
+       ,*.tar)           DFLAG=""  ;;
+       ,*)               DFLAG=""  ;;
+     esac
+
+     # Extract quietly into DEST
+     if ! tar -x${DFLAG}f "$SRC" -C "$DEST" --warning=no-unknown-keyword; then
+       echo "❌ Extraction failed."
+       exit 3
+     fi
+
+     # Simple success summary
+     FILES=$(find "$DEST" -type f | wc -l | tr -d ' ')
+     echo "✅ Extracted $(basename "$SRC") into '$DEST' ($FILES files)."
    #+END_SRC
+
+   #+RESULTS:
+   : Uncompressing cross-compile toolchain…
+   : ✅ Extracted kernel_src.tbz2 into '/home/fabricio/projects/nvidia/nvidia_sdk/JetPack_5.1.2_Linux_JETSON_ORIN_NX_TARGETS/Linux_for_Tegra/source/public/kernel_src' (81613 files).
 
 2. Build DTB
 
     #+NAME : build-dtbs
-   #+BEGIN_SRC shell :results output replace :exports both \
-     :dir ~/projects/nvidia/nvidia_sdk/public_sources/Linux_for_Tegra/source/public/kernel_src/kernel/kernel-5.10 \
-     :var cross="/home/india/tools/bootlin-toolchain-gcc-93/bin/aarch64-buildroot-linux-gnu-" \
-     :var dtb_target="dtbs"
+   #+BEGIN_SRC shell :results output replace :exports both :dir ~/projects/nvidia/nvidia_sdk/JetPack_5.1.2_Linux_JETSON_ORIN_NX_TARGETS/Linux_for_Tegra/source/public/kernel_src/kernel/kernel-5.10  :var cross="~/tools/bootlin-toolchain-gcc-93/bin/aarch64-buildroot-linux-gnu-" :var dtb_target="dtbs"
 
      set -euo pipefail
 
@@ -221,8 +362,53 @@ Notes:
      echo "Done."
 #+END_SRC
 
+#+RESULTS:
+
 3. Copy the rebuilt DTB to your Jetson
 
+* Fixing USB port conflicts in Ubuntu
+
+1. Swap the cable & port.
+2. Use a short, data-capable USB-C cable (ideally the NVIDIA devkit cable).
+3. Plug directly into a rear USB2.0 port on the PC (avoid hubs/front-panel/USB3 ports).
+4. Don’t use adapters or docks.
+5. Power-cycle into recovery correctly.
+
+   #+BEGIN_EXAMPLE
+   Power off Jetson → hold Force Recovery → tap Reset (or power on) → release Force Recovery after ~2s.
+   #+END_EXAMPLE
+
+6. On host:
+
+   #+BEGIN_SRC shell
+     lsusb | grep -i NVidia
+   #+END_SRC
+   You should see ~Bus 003 Device 073: ID 0955:7423 NVidia Corp.~ If not, you’re not in recovery (RCM).
+
+7. Stop grabby host services
+
+   #+BEGIN_SRC shell :dir /sudo::
+     sudo systemctl stop ModemManager
+     # If brltty is installed (often on Ubuntu), remove it; it hijacks USB serial:
+     sudo apt -y purge brltty || true
+   #+END_SRC
+
+8. Disable USB autosuspend (host)
+
+   #+BEGIN_SRC shell :dir /sudo::
+     # Temporary (until reboot):
+     echo -1 | sudo tee /sys/module/usbcore/parameters/autosuspend >/dev/null
+   #+END_SRC
+
+9. Unplug/replug, re-enter recovery, then retry flash in SDK Manager.
+
+10. Verify the connection before flashing. Run these and confirm:
+    #+BEGIN_SRC shell :dir /sudo::
+      lsusb | grep -i nvidia          # shows 0955:xxxx
+      dmesg | tail -n 50              # no repeated USB resets/disconnects
+   #+END_SRC
+
+If you see lots of ~reset high-speed USB device”/“device descriptor read/64, error -71~, it’s cable/port/hub.
 
 * Downloading SDK  JetPack
 
