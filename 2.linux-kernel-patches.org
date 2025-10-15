@@ -1,6 +1,6 @@
-#+TITLE: 2. Flashing the Jetson Orin Module
+#+TITLE: 2. NVIDIA Jetson Linux 35.4.1 Patches
 #+AUTHOR: Fabricio Puente Mansilla
-#+DATE: <2025-04-09 Wed>
+#+DATE: <2025-10-15 Wed>
 #+EMAIL: fpuentem@visiontechconsulting.ca
 #+EXCLUDE_TAGS: noexport debian
 #+OPTIONS: email:t toc:nil num:nil
@@ -9,21 +9,24 @@ This section details the process of flashing the operating system onto
 your Jetson Orin module using the NVIDIA SDK Manager on an Ubuntu host
 machine.
 
-* Preparation
+* Install host build dependencies (Ubuntu/Debian)
 
-Before starting the flashing process, ensure the following:
+#+BEGIN_SRC shell :dir /sudo:: :results none :exports code
+  sudo apt-get update
+  sudo apt-get install -y \
+       build-essential bc bison flex \
+       libssl-dev libelf-dev \
+       dwarves device-tree-compiler \
+       libncurses5-dev libncursesw5-dev \
+       rsync cpio
+#+END_SRC
 
-- *Host Computer Setup:*
-  - Your Ubuntu host computer meets the software and hardware requirements outlined in [[file:1.prerequisites.org][Prerequisites]].
-  - NVIDIA SDK Manager is installed on your host computer. If not, follow the instructions in the [[file:2.jetson-orin-flash.org::*Downloading SDK Manager/JetPack][Downloading SDK Manager/JetPack]] section.
-  - Ensure you have a stable internet connection. The flashing process involves downloading large files.
-- *Jetson Orin Module and Carrier Board (F2):*
-  - The Jetson Orin module is securely installed on your F2 custom carrier board. Refer to your carrier board's documentation for installation instructions if needed.
-  - Have the USB cable required (USB Type-A to Type-C) for flashing connected to your host computer and within easy reach to connect to the F2 carrier board (RECOVERY connector).
-    [[./images/recovery-usb-conn.png]]
-  - Locate the *Recovery Button* (S1) on your F2 carrier board. This button is crucial for putting the Jetson Orin module into Force Recovery Mode, which is necessary for flashing.
-    [[./images/recovery-button.png]]
-- *Power Supply:* Have the correct power supply for your F2 carrier board ready to be connected after the module is in Force Recovery Mode.
+Notes:
+
+- ~flex/bison~ are needed for Kconfig and headers.
+- ~libssl-dev/libelf-dev~ are common kernel deps.
+- ~dwarves~ provides pahole (some configs require it).
+- ~device-tree-compiler~ is handy for checking DTs on the target.
 
 * Setting up cross-compilation tool
 
@@ -32,8 +35,6 @@ Before starting the flashing process, ensure the following:
    #+BEGIN_SRC shell :exports code :output none
      mkdir -p ~/tools/bootlin-toolchain-gcc-93
    #+END_SRC
-
-   #+RESULTS:
 
 2. Download Bootlin Toolchain ~gcc~.
    #+BEGIN_SRC shell :dir ~/Downloads :results output replace :exports both
@@ -168,11 +169,11 @@ Reference: https://developer.nvidia.com/embedded/jetson-linux-r3541
   : Downloading tar ball into /home/fabricio/Downloads...
   : ✅ Download succeeded: 'public_sources.tbz2' (193808816 bytes).
 
-3. Download Sample Root Filesystem Source
+3. Download Drivers - Driver Package (BSP)
 
    #+BEGIN_SRC shell :dir ~/Downloads :results output replace :exports both
      set -u
-     URL="https://developer.nvidia.com/downloads/embedded/l4t/r35_release_v4.1/sources/ubuntu_focal-l4t_aarch64_src.tbz2"
+     URL="https://developer.nvidia.com/downloads/embedded/l4t/r35_release_v4.1/release/jetson_linux_r35.4.1_aarch64.tbz2"
      BASE=${URL##*/}
      echo "Downloading tar ball into $(pwd)..."
      # Remove any previous downloads that match this name pattern
@@ -200,8 +201,8 @@ Reference: https://developer.nvidia.com/embedded/jetson-linux-r3541
      fi
   #+END_SRC
 
-4. Uncompress files
-   
+4. Uncompress Jetson Linux 35.4.1 source code
+
    #+BEGIN_SRC shell :results output replace :exports both
      # tar zxvf ~/Downloads/bootlin-toolchain-gcc-93 -C ~/tools/bootlin-toolchain-gcc-93
      #      tar xvf ~/Downloads/public_sources.tbz2 -C ~/projects/nvidia/nvidia_sdk/JetPack_5.1.2_Linux_JETSON_ORIN_NX_TARGETS
@@ -210,7 +211,7 @@ Reference: https://developer.nvidia.com/embedded/jetson-linux-r3541
 
      # Where to find / place things
      DL_DIR="$HOME/Downloads"
-     GLOB="public_sources*"
+     GLOB="Jetson_Linux_R35.4.1_aarch64*"
      DEST="$HOME/projects/nvidia/nvidia_sdk/JetPack_5.1.2_Linux_JETSON_ORIN_NX_TARGETS"
 
      # Find newest matching tarball
@@ -253,27 +254,80 @@ Reference: https://developer.nvidia.com/embedded/jetson-linux-r3541
    #+RESULTS:
    : ✅ Extracted public_sources.tbz2 into '/home/fabricio/projects/nvidia/nvidia_sdk/JetPack_5.1.2_Linux_JETSON_ORIN_NX_TARGETS' (63 files).
 
-* Install host build dependencies (Ubuntu/Debian)
+*  EEPROM Modifications
+Reference: https://docs.nvidia.com/jetson/archives/r35.3.1/DeveloperGuide/text/HR/JetsonModuleAdaptationAndBringUp/JetsonOrinNxNanoSeries.html#eeprom-modifications
 
-#+BEGIN_SRC shell :dir /sudo:: :results none :exports code
-  sudo apt-get update
-  sudo apt-get install -y \
-       build-essential bc bison flex \
-       libssl-dev libelf-dev \
-       dwarves device-tree-compiler \
-       libncurses5-dev libncursesw5-dev \
-       rsync cpio
+EEPROM is an optional component for a customized carrier board. If the carrier board is designed without an EEPROM, the following modifications will be needed on the MB2 BCT file:
+
+~Linux_for_Tegra/bootloader/t186ref/BCT/tegra234-mb2-bct-misc-p3767-0000.dts~
+#+BEGIN_SRC diff
+- cvb_eeprom_read_size = <0x100>
++ cvb_eeprom_read_size = <0x0>
 #+END_SRC
 
-Notes:
+#+NAME: patch_eeprom_read_size
+#+BEGIN_SRC shell :results output replace :exports both :var L4T_DIR="~/nvidia/nvidia_sdk/JetPack_5.1.2_Linux_JETSON_ORIN_NX_TARGETS/Linux_for_Tegra/bootloader/t186ref/BCT/"
+  set -euo pipefail
 
-- ~flex/bison~ are needed for Kconfig and headers.
-- ~libssl-dev/libelf-dev~ are common kernel deps.
-- ~dwarves~ provides pahole (some configs require it).
-- ~device-tree-compiler~ is handy for checking DTs on the target.
+  # 1) Locate the MB2 BCT "misc" DTS (common paths vary by L4T release)
+  target_name="tegra234-mb2-bct-misc-p3767-0000.dts"
+  target="$(find -L "$L4T_DIR" -type f -name "$target_name" 2>/dev/null | head -n1 || true)"
 
-* Run config and build DTS 
-1. Uncompress kernel source code
+  if [ -z "$target" ]; then
+    echo "ERROR: '$target_name' not found under: $L4T_DIR"
+    exit 1
+  fi
+
+  echo "Target: $target"
+
+  # 2) Show current value (for context)
+  current="$(grep -nE 'cvb_eeprom_read_size' "$target" || true)"
+  echo "Before:"
+  echo "${current:-<not found>}"
+
+  # 3) Only modify if it's currently 0x100 (idempotent)
+  if grep -qE 'cvb_eeprom_read_size\s*=\s*<0x100>' "$target"; then
+    ts="$(date +%Y%m%d-%H%M%S)"
+    backup="${target}.bak.${ts}"
+    cp -a -- "$target" "$backup"
+
+    # Portable, safe in-place edit
+    perl -0777 -pe 's/cvb_eeprom_read_size\s*=\s*<0x100>/cvb_eeprom_read_size = <0x0>/g' \
+      > "${target}.tmp.$$" < "$target"
+    mv -- "${target}.tmp.$$" "$target"
+
+    echo "Backup created: $backup"
+    echo "Patch applied: 0x100 -> 0x0"
+  else
+    echo "No change needed (either already 0x0 or key not found)."
+  fi
+
+  # 4) Verify and show a minimal diff
+  echo "After:"
+  grep -nE 'cvb_eeprom_read_size' "$target" || echo "<not found>"
+
+  echo
+  echo "Diff:"
+  # Busybox-compatible fallback to colordiff if available
+  if command -v colordiff >/dev/null 2>&1 && ls "${backup:-/dev/null}" >/dev/null 2>&1; then
+    colordiff -u "${backup}" "$target" | sed -n '1,50p'
+  elif ls "${backup:-/dev/null}" >/dev/null 2>&1; then
+    diff -u "${backup}" "$target" | sed -n '1,50p'
+  else
+    echo "<no diff to show>"
+  fi
+#+END_SRC
+
+#+RESULTS: patch_eeprom_read_size
+: ERROR: 'tegra234-mb2-bct-misc-p3767-0000.dts' not found under: ~/nvidia/nvidia_sdk/JetPack_5.1.2_Linux_JETSON_ORIN_NX_TARGETS/Linux_for_Tegra/bootloader/t186ref/BCT/
+
+* Enable PCIE3 - Secondary Ethernet port
+Reference:
+- https://forums.developer.nvidia.com/t/how-to-enable-the-pcie3-of-orin-nano/254908
+- https://forums.developer.nvidia.com/t/how-to-enable-pcie3-with-orin-nano/335945
+
+
+** Uncompress kernel source code
 
    #+BEGIN_SRC shell :results output replace :exports both
      # mkdir -p ./kernel_src
@@ -325,7 +379,7 @@ Notes:
    #+RESULTS:
    : ✅ Extracted kernel_src.tbz2 into '/home/fabricio/projects/nvidia/nvidia_sdk/JetPack_5.1.2_Linux_JETSON_ORIN_NX_TARGETS/Linux_for_Tegra/source/public/kernel_src' (81613 files).
 
-2. Build DTB
+** Build DTB
 
     #+NAME : build-dtbs
    #+BEGIN_SRC shell :results output replace :exports both :dir ~/projects/nvidia/nvidia_sdk/JetPack_5.1.2_Linux_JETSON_ORIN_NX_TARGETS/Linux_for_Tegra/source/public/kernel_src/kernel/kernel-5.10  :var cross="~/tools/bootlin-toolchain-gcc-93/bin/aarch64-buildroot-linux-gnu-" :var dtb_target="dtbs"
@@ -360,119 +414,17 @@ Notes:
 
 #+RESULTS:
 
-3. Copy the rebuilt DTB to your Jetson
+** Copy the rebuilt DTB to your Jetson
 
-* Fixing USB port conflicts in Ubuntu 18.04
 
-1. Swap the cable & port.
-2. Use a short, data-capable USB-C cable (ideally the NVIDIA devkit cable).
-3. Plug directly into a rear USB2.0 port on the PC (avoid hubs/front-panel/USB3 ports).
-4. Don’t use adapters or docks.
-5. Power-cycle into recovery correctly.
+* Fix the AX210 Bluetooth
+Reference:
+https://forums.developer.nvidia.com/t/please-add-these-kernel-patchs-for-fixing-ax210-bluetooth/264029
 
-   #+BEGIN_EXAMPLE
-   Power off Jetson → hold Force Recovery → tap Reset (or power on) → release Force Recovery after ~2s.
-   #+END_EXAMPLE
+* Enable RM520N-GL 5G Card
+Reference:
+https://nvidia-jetson.piveral.com/jetson-orin-nano/connecting-quectel-rm520n-gl-5g-module-to-nvidia-jetson-orin/
 
-6. On host:
-
-   #+BEGIN_SRC shell
-     lsusb | grep -i nvidia
-   #+END_SRC
-   You should see ~Bus 003 Device 073: ID 0955:7423 NVidia Corp.~ If not, you’re not in recovery (RCM).
-
-7. Stop grabby host services
-
-   #+BEGIN_SRC shell :dir /sudo::
-     sudo systemctl stop ModemManager
-     # If brltty is installed (often on Ubuntu), remove it; it hijacks USB serial:
-     sudo apt -y purge brltty || true
-   #+END_SRC
-
-8. Disable USB autosuspend (host)
-
-   #+BEGIN_SRC shell :dir /sudo::
-     # Temporary (until reboot):
-     echo -1 | sudo tee /sys/module/usbcore/parameters/autosuspend >/dev/null
-   #+END_SRC
-
-9. Unplug/replug, re-enter recovery, then retry flash in SDK Manager.
-
-10. Verify the connection before flashing. Run these and confirm:
-    #+BEGIN_SRC shell :dir /sudo::
-      lsusb | grep -i nvidia          # shows 0955:xxxx
-      dmesg | tail -n 50              # no repeated USB resets/disconnects
-   #+END_SRC
-
-If you see lots of ~reset high-speed USB device”/“device descriptor read/64, error -71~, it’s cable/port/hub.
-
-* Downloading SDK  JetPack
-
-1. *Open NVIDIA SDK Manager:* You can usually find it in your Ubuntu application menu or by running the ~sdkmanager --archived-versions~ command in your terminal.
-2. *Log in:* Enter your NVIDIA Developer account credentials.
-3. *Select Target Hardware:*
-   - In the "Product Category" block, choose the *Jetson* family.
-   - Then, select your specific *Jetson Orin module* (e.g., Jetson Orin NX series, Jetson Orin Nano series).
-   - Under "SDK Version," the default (usually the latest JetPack version) is generally recommended. We use *JetPack 5.1.2*.
-   - Also, choose *DeepStream* in "Additional SDKs".
-   [[./images/sdkmanager-step-1.png]]
-4. *Select Host Machine:* Ensure your host machine is correctly identified (should be your Ubuntu system).
-5. *Proceed to Next Step:* Click on the "Continue" button.
-
-* Flashing Procedure (using SDK Manager)
-
-1. *Select Components:* In the "Details and License" step, you will see various options for SDK components.
-
-   - For a basic flash, ensure that the *Jetson Linux* and *Jetson Runtime* are selected. You can deselect other components like CUDA, cuDNN, TensorRT, etc., if you only want to flash the base operating system initially. You can install these later if needed.
-
-   - Carefully review the selected components and their versions.
-
-   -  [[https://docs.nvidia.com/jetson/archives/r35.3.1/DeveloperGuide/text/HR/JetsonModuleAdaptationAndBringUp/JetsonOrinNxNanoSeries.html#eeprom-modifications][EPROM modifications]].
-
-2. *Review Licenses:* Accept the necessary licenses by checking the "I accept the terms and conditions" boxes.
-   [[./images/sdkmanager-step2.png]]
-
-3. *Initiate Flashing:* Click on the "Continue" button to begin the download and flashing process.
-   In the "Recovery mode setup" choose "Manual Setup", and in item 8 use a default password *nvidia* and user *nvidia*.
-   [[./images/recovery-preconfig.png]]
-
-4. *Put Jetson Orin into Force Recovery Mode:* SDK Manager will guide you through the steps to put your Jetson Orin module into Force Recovery Mode. This typically involves the following sequence:
-   a. *Ensure the F2 carrier board is powered OFF.*
-   b. *Connect the USB cable* from your host computer to the designated USB port on the F2 carrier board (refer to your carrier board's documentation for the correct port (RECOVERY connector), often a USB Type-C or Micro-USB port labeled for flashing).
-   c. *Press and hold the Recovery Button* on the F2 carrier board.
-   d. *While still holding the Recovery Button, briefly press and release the Power Button* on the F2 carrier board.
-   e. *Release the Recovery Button.*
-   f. *Power ON the F2 carrier board* (if it didn't power on automatically).
-
-5. *SDK Manager Detection:* SDK Manager should now detect your Jetson Orin module in Force Recovery Mode. If it doesn't, refer to the [[file:2.jetson-orin-flash.org::*Troubleshooting Flashing Issues][Troubleshooting Flashing Issues]] section.
-
-6. *Flashing Begins:* Once the module is detected, SDK Manager will automatically start downloading the necessary files and flashing the operating system onto the Jetson Orin module. This process can take a significant amount of time depending on your internet speed and system resources.
-
-7. *Monitor the Progress:* Keep an eye on the SDK Manager window for progress updates and any error messages.
-
-8. *Flashing Complete:* Once the process is finished successfully, SDK Manager will display a "Flash Successful" message. You can now disconnect the USB cable and power cycle your Jetson Orin module on the F2 carrier board. It should boot into the newly flashed operating system.
-
-* Flashing Procedure (using JetPack CLI)
-
-*(This section is intentionally left out as per the initial thought process. If the user requests it later, I can add it.)*
-
-* Troubleshooting Flashing Issues
-
-Here are some common issues that might occur during the flashing process and potential solutions:
-
-- *SDK Manager not detecting the Jetson Orin in Force Recovery Mode:*
-  - *Incorrect USB Cable:* Ensure you are using the correct and a high-quality USB cable. Try a different USB cable if possible.
-  - *Incorrect USB Port:* Verify you are connecting the USB cable to the correct port on your F2 carrier board intended for flashing. Consult your carrier board's documentation.
-  - *Driver Issues on Host:* Sometimes, the host computer might not have the necessary USB drivers. SDK Manager usually handles this, but you can try restarting your host computer.
-  - *Incorrect Force Recovery Mode Procedure:* Double-check the steps for entering Force Recovery Mode for your F2 carrier board. The timing of pressing and releasing the buttons is crucial.
-  - *Virtual Machine Issues:* If you are running SDK Manager in a virtual machine, it can sometimes cause issues with USB device detection. Try running it directly on your host operating system if possible.
-- *Download Errors:*
-  - *Network Connectivity:* Ensure you have a stable internet connection. Try restarting your router or switching to a different network if possible.
-  - *Disk Space:* Verify that you have enough free disk space on your host computer to download and store the SDK components.
-- *Flashing Errors during the process:*
-  - *Check SDK Manager Logs:* SDK Manager usually provides detailed logs that can help identify the cause of the error. Look for error messages and try searching for them online.
-  - *Try Flashing Again:* Sometimes, a temporary glitch can cause the flash to fail. Try restarting SDK Manager and repeating the flashing process.
-  - *Consult NVIDIA Developer Forums:* If you encounter persistent issues, the NVIDIA Developer forums ([[https://forums.developer.nvidia.com/]]) are a great resource for finding solutions to common problems. Search for similar issues or post a new question with detailed information about your setup and the error messages you are seeing.
-- *Carrier Board Specific Issues:* Consult the documentation for your F2 custom carrier board for any specific flashing instructions or known issues.
-
-If you continue to experience problems, carefully review the NVIDIA SDK Manager documentation and the documentation for your F2 carrier board for more detailed troubleshooting steps.
+* Fix Secondary Ethernet LEDs
+Reference:
+https://forums.developer.nvidia.com/t/ethernet-led/263063
