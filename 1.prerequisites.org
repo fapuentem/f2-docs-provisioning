@@ -19,38 +19,41 @@ Before starting the provisioning process, ensure you have the following hardware
   - Recommendation: A high-quality USB cable is recommended to avoid
     data transfer issues during flashing.
 - *Host Computer:*
-  - Operating System: Ubuntu GNU/Linux 18.04 LTS or 20.04 LTS is
-    recommended for optimal compatibility with NVIDIA SDK Manager).
-  - Processor: i5
-  - RAM: 8GB or more recommended
+  - Operating System: Ubuntu GNU/Linux 18.04 LTS is recommended for
+    optimal compatibility with NVIDIA SDK Manager).
+  - Processor: Intel Core i5 class (or better).
+  - RAM: > 8 GB (16 GB recommended).
   - Disk Space: At least 50GB free disk space for downloading and
     storing SDK components.
 - *Ethernet Cable (Optional):* Recommended for a stable network
-  connection during the initial setup and software installations. Your
-  carrier board will need an Ethernet port.
+  connection during the initial setup and software installations.
 - *Storage:*
   - Type: NVMe SSD
   - Size: 128GB or larger NVMe SSD.
 
-* Software Requirements (on the Host Computer - Ubuntu)
+* Software Requirements (Host: Ubuntu)
 
-- Update and upgrade repository.
+- Update the package index and upgrade installed packages:
 
   #+BEGIN_SRC shell :results none :exports code :dir /sudo::
+    set -euo pipefail
+    export DEBIAN_FRONTEND=noninteractive
     apt update
     apt upgrade -y
  #+END_SRC
 
-- Install requirements
+- Install base tooling:
 
   #+BEGIN_SRC shell :results none :exports code :dir /sudo::
+    set -euo pipefail
+    export DEBIAN_FRONTEND=noninteractive
     apt install git
  #+END_SRC
 
 - *NVIDIA SDK Manager:* Download and install the latest version of
   NVIDIA SDK Manager from the official NVIDIA repositories:
 
-  1. Download the ~.deb~ package.
+  1. Download the CUDA keyring ~.deb~ that adds NVIDIA’s repository (name varies by Ubuntu release):
 
      #+BEGIN_SRC shell :dir ~/Downloads :results output
        # Compute NVIDIA's token: ubuntu1804 / 2004 / 2204 / 2404
@@ -88,7 +91,8 @@ Before starting the provisioning process, ensure you have the following hardware
      : Downloading tar ball into /home/fabricio/Downloads...
      : ✅ Download succeeded: 'cuda-keyring_1.1-1_all.deb' (4332 bytes).
 
-  2. Install ~.deb~ package
+  2. Install the keyring package and refresh APT:
+
      #+NAME: get_home
      #+BEGIN_SRC shell :results output :exports none
        printf %s "$HOME"
@@ -155,7 +159,7 @@ Before starting the provisioning process, ensure you have the following hardware
      #+RESULTS:
      : sdkmanager installed successfully
 
-  4. Check sanity of ~sdkmanager~
+  4. Verify ~sdkmanager~
 
      #+BEGIN_SRC shell :results output replace :exports both
        # double-check it’s on PATH and show version

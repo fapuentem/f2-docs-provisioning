@@ -6,8 +6,7 @@
 #+OPTIONS: email:t toc:nil num:nil
 
 * README :noexport:
-This is a literate document that can potentially execute code on your computer! It's about how to
-build flash environment for NVIDIA Jetson Orin NX device.
+This is a literate document that can potentially execute code on your computer!
 
 * Document constants :noexport:
 :PROPERTIES:
