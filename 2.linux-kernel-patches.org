@@ -165,10 +165,6 @@ Reference: https://developer.nvidia.com/embedded/jetson-linux-r3541
      fi
   #+END_SRC
 
-  #+RESULTS:
-  : Downloading tar ball into /home/fabricio/Downloads...
-  : ✅ Download succeeded: 'public_sources.tbz2' (193808816 bytes).
-
 3. Uncompress Jetson Linux 35.4.1 source code
 
    #+BEGIN_SRC shell :results output replace :exports both
@@ -219,9 +215,6 @@ Reference: https://developer.nvidia.com/embedded/jetson-linux-r3541
      echo "✅ Extracted $(basename "$SRC") into '$DEST' ($FILES files)."
    #+END_SRC
 
-   #+RESULTS:
-   : ✅ Extracted public_sources.tbz2 into '/home/fabricio/projects/nvidia/nvidia_sdk/JetPack_5.1.2_Linux_JETSON_ORIN_NX_TARGETS' (63 files).
-
 4. Uncompress kernel source code
 
    #+BEGIN_SRC shell :results output replace :exports both
@@ -270,9 +263,6 @@ Reference: https://developer.nvidia.com/embedded/jetson-linux-r3541
      FILES=$(find "$DEST" -type f | wc -l | tr -d ' ')
      echo "✅ Extracted $(basename "$SRC") into '$DEST' ($FILES files)."
    #+END_SRC
-
-   #+RESULTS:
-
 
 *  EEPROM Modifications
 Reference: https://docs.nvidia.com/jetson/archives/r35.3.1/DeveloperGuide/text/HR/JetsonModuleAdaptationAndBringUp/JetsonOrinNxNanoSeries.html#eeprom-modifications
@@ -344,9 +334,6 @@ EEPROM is an optional component for a customized carrier board. If the carrier b
   fi
 #+END_SRC
 
-#+RESULTS: patch_eeprom_read_size
-: ERROR: 'tegra234-mb2-bct-misc-p3767-0000.dts' not found under: ~/nvidia/nvidia_sdk/JetPack_5.1.2_Linux_JETSON_ORIN_NX_TARGETS/Linux_for_Tegra/bootloader/t186ref/BCT/
-
 * Enable PCIE3 - Secondary Ethernet port
 Reference:
 - https://forums.developer.nvidia.com/t/how-to-enable-the-pcie3-of-orin-nano/254908
@@ -409,9 +396,6 @@ Reference:
     fi
   fi
 #+END_SRC
-
-#+RESULTS: patch_odmdata_p3767
-: ERROR: p3767.conf.common not found under: /home/fabricio/nvidia/nvidia_sdk/JetPack_5.1.2_Linux_JETSON_ORIN_NX_TARGETS
 
 ** Update DTS
 #+NAME: add_pcie_nodes_tegra234_p3509
@@ -530,10 +514,66 @@ Reference:
   echo "Done."
 #+END_SRC
 
-#+RESULTS:
-
 ** Copy the DTBs to your Jetson
 
+#+NAME: copy_dtbo_files
+#+BEGIN_SRC shell :results output replace :exports both
+set -euo pipefail
+
+SRC="/home/india/projects/nvidia/nvidia_sdk/JetPack_5.1.2_Linux_JETSON_ORIN_NX_TARGETS/Linux_for_Tegra/source/public/kernel_src/build/arch/arm64/boot/dts/nvidia"
+DST="/home/india/nvidia/nvidia_sdk/JetPack_5.1.2_Linux_JETSON_ORIN_NX_TARGETS/Linux_for_Tegra/kernel/dtb"
+
+echo "Source:      $SRC"
+echo "Destination: $DST"
+echo
+
+# 1) Sanity checks
+[ -d "$SRC" ] || { echo "ERROR: Source directory not found."; exit 1; }
+mkdir -p "$DST"
+
+# 2) Collect dtbo list
+mapfile -t DTBOS < <(find "$SRC" -maxdepth 1 -type f -name '*.dtbo' -printf '%f\n' | sort)
+if [ ${#DTBOS[@]} -eq 0 ]; then
+  echo "No .dtbo files found in source."
+  exit 0
+fi
+
+# 3) Prefer rsync if available; fall back to a POSIX loop
+if command -v rsync >/dev/null 2>&1; then
+  echo "Using rsync…"
+  rsync -a --human-readable \
+        --include='*.dtbo' --exclude='*' \
+        --info=NAME,STATS "$SRC/" "$DST/"
+else
+  echo "rsync not found — using install/cmp loop…"
+  updated=0 skipped=0
+  for f in "${DTBOS[@]}"; do
+    srcf="$SRC/$f"
+    dstf="$DST/$f"
+    if [ -f "$dstf" ] && cmp -s "$srcf" "$dstf"; then
+      printf "skip  %s (unchanged)\n" "$f"
+      : $((skipped++))
+    else
+      # 0644 perms, preserve times with -p if available
+      if install -m 0644 "$srcf" "$dstf"; then
+        touch -r "$srcf" "$dstf" 2>/dev/null || true
+        printf "copy  %s\n" "$f"
+        : $((updated++))
+      else
+        printf "ERROR copying %s\n" "$f" >&2
+      fi
+    fi
+  done
+  echo
+  echo "Summary: $updated updated, $skipped skipped"
+fi
+
+# 4) Show a brief listing at destination
+echo
+echo "Destination contents (*.dtbo):"
+ls -1 "$DST"/*.dtbo 2>/dev/null | sed "s|$DST/||" | head -n 50
+[ "$(ls -1 "$DST"/*.dtbo 2>/dev/null | wc -l)" -le 50 ] || echo "… (truncated)"
+#+END_SRC
 
 * Fix the AX210 Bluetooth
 Reference:
