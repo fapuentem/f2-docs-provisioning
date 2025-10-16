@@ -414,6 +414,88 @@ Reference:
 : ERROR: p3767.conf.common not found under: /home/fabricio/nvidia/nvidia_sdk/JetPack_5.1.2_Linux_JETSON_ORIN_NX_TARGETS
 
 ** Update DTS
+#+NAME: add_pcie_nodes_tegra234_p3509
+#+BEGIN_SRC shell :results output replace :exports both :var HOME=get_home()
+  set -euo pipefail
+
+  # ---- CONFIG ----
+  file="$HOME/projects/nvidia/nvidia_sdk/JetPack_5.1.2_Linux_JETSON_ORIN_NX_TARGETS/Linux_for_Tegra/source/public/kernel_src/hardware/nvidia/platform/t23x/p3768/kernel-dts/cvb/tegra234-p3509-a02-pcie.dtsi"
+
+  insert='
+        pcie@141e0000 { /* C7x1 node */
+                status = "okay";
+                phys = <&p2u_gbe_0>;
+                phy-names = "p2u-0";
+        };
+
+        pcie@140c0000 { /* C9x1 */
+                status = "okay";
+                phys = <&p2u_gbe_1>;
+                phy-names = "p2u-0";
+        };
+  '
+
+  # ---- PRECHECKS ----
+  if [ ! -f "$file" ]; then
+    echo "ERROR: File not found: $file"
+    exit 1
+  fi
+
+  echo "Target: $file"
+  echo "Checking current PCIe nodes..."
+  grep -nE 'pcie@141e0000|pcie@140c0000' "$file" || echo "<nodes not present>"
+
+  # If both nodes are already present, do nothing.
+  if grep -q 'pcie@141e0000' "$file" && grep -q 'pcie@140c0000' "$file"; then
+    echo "No change needed (both nodes already present)."
+    exit 0
+  fi
+
+  # ---- BACKUP ----
+  ts="$(date +%Y%m%d-%H%M%S)"
+  backup="${file}.bak.${ts}"
+  cp -a -- "$file" "$backup"
+  echo "Backup created: $backup"
+
+  # ---- PATCH ----
+  # Insert the new nodes *before* the final closing brace of the root node.
+  # Only insert blocks that are missing (avoid duplicates if one exists).
+  perl -0777 -pe '
+    my $add = q('"$insert"');
+
+    # Build minimal blocks, so we can add only the missing ones
+    my $n141e = qq{\n\tpcie\@141e0000 { /* C7x1 node */\n\t\tstatus = "okay";\n\t\tphys = <&p2u_gbe_0>;\n\t\tphy-names = "p2u-0";\n\t};\n};
+    my $n140c = qq{\n\tpcie\@140c0000 { /* C9x1 */\n\t\tstatus = "okay";\n\t\tphys = <&p2u_gbe_1>;\n\t\tphy-names = "p2u-0";\n\t};\n};
+
+    my $need141e = ($_ !~ /pcie\@141e0000/);
+    my $need140c = ($_ !~ /pcie\@140c0000/);
+
+    my $to_add = "";
+    $to_add .= $n141e if $need141e;
+    $to_add .= "\n" if $need141e && $need140c;
+    $to_add .= $n140c if $need140c;
+
+    if ($to_add ne "") {
+      # Insert right before the file-ending root "};"
+      s/\n\};\s*\z/\n$to_add\n};/s;
+    }
+  ' "$file" > "${file}.tmp.$$"
+
+  mv -- "${file}.tmp.$$" "$file"
+  echo "Patch applied."
+
+  # ---- VERIFY ----
+  echo "After:"
+  grep -nE 'pcie@141e0000|pcie@140c0000' "$file" || echo "<not found>"
+
+  echo
+  echo "Diff (backup vs patched):"
+  if command -v colordiff >/dev/null 2>&1; then
+    colordiff -u "$backup" "$file" | sed -n '1,120p'
+  else
+    diff -u "$backup" "$file" | sed -n '1,120p'
+  fi
+#+END_SRC
 
 ** Build DTB
 
