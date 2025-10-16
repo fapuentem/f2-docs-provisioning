@@ -264,7 +264,7 @@ Reference: https://developer.nvidia.com/embedded/jetson-linux-r3541
      echo "✅ Extracted $(basename "$SRC") into '$DEST' ($FILES files)."
    #+END_SRC
 
-*  EEPROM Modifications
+* EEPROM Modifications
 Reference: https://docs.nvidia.com/jetson/archives/r35.3.1/DeveloperGuide/text/HR/JetsonModuleAdaptationAndBringUp/JetsonOrinNxNanoSeries.html#eeprom-modifications
 
 EEPROM is an optional component for a customized carrier board. If the carrier board is designed without an EEPROM, the following modifications will be needed on the MB2 BCT file:
