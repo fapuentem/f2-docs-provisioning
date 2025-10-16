@@ -169,39 +169,7 @@ Reference: https://developer.nvidia.com/embedded/jetson-linux-r3541
   : Downloading tar ball into /home/fabricio/Downloads...
   : ✅ Download succeeded: 'public_sources.tbz2' (193808816 bytes).
 
-3. Download Drivers - Driver Package (BSP)
-
-   #+BEGIN_SRC shell :dir ~/Downloads :results output replace :exports both
-     set -u
-     URL="https://developer.nvidia.com/downloads/embedded/l4t/r35_release_v4.1/release/jetson_linux_r35.4.1_aarch64.tbz2"
-     BASE=${URL##*/}
-     echo "Downloading tar ball into $(pwd)..."
-     # Remove any previous downloads that match this name pattern
-     rm -f "$BASE" 2>/dev/null || true
-
-     # Use Content-Disposition/redirect name if the server provides it
-     if wget --quiet "$URL"; then
-       NEWFILE="$(ls -t $BASE 2>/dev/null | head -n1 || true)"
-       if [ -n "${NEWFILE:-}" ] && [ -s "$NEWFILE" ]; then
-         # Get file size in bytes (portable-ish)
-         if command -v stat >/dev/null 2>&1; then
-           BYTES=$(stat -c%s "$NEWFILE" 2>/dev/null || stat -f%z "$NEWFILE" 2>/dev/null || wc -c < "$NEWFILE")
-         else
-           BYTES=$(wc -c < "$NEWFILE")
-         fi
-         echo "✅ Download succeeded: '$NEWFILE' (${BYTES} bytes)."
-         exit 0
-       else
-         echo "❌ Download reported success, but file missing or empty."
-         exit 2
-       fi
-     else
-       echo "❌ Download failed from: $URL"
-       exit 1
-     fi
-  #+END_SRC
-
-4. Uncompress Jetson Linux 35.4.1 source code
+3. Uncompress Jetson Linux 35.4.1 source code
 
    #+BEGIN_SRC shell :results output replace :exports both
      # tar zxvf ~/Downloads/bootlin-toolchain-gcc-93 -C ~/tools/bootlin-toolchain-gcc-93
@@ -211,7 +179,7 @@ Reference: https://developer.nvidia.com/embedded/jetson-linux-r3541
 
      # Where to find / place things
      DL_DIR="$HOME/Downloads"
-     GLOB="Jetson_Linux_R35.4.1_aarch64*"
+     GLOB="public_sources*"
      DEST="$HOME/projects/nvidia/nvidia_sdk/JetPack_5.1.2_Linux_JETSON_ORIN_NX_TARGETS"
 
      # Find newest matching tarball
@@ -332,7 +300,6 @@ Reference:
 - https://forums.developer.nvidia.com/t/how-to-enable-the-pcie3-of-orin-nano/254908
 - https://forums.developer.nvidia.com/t/how-to-enable-pcie3-with-orin-nano/335945
 
-
 ** Uncompress kernel source code
 
    #+BEGIN_SRC shell :results output replace :exports both
@@ -341,7 +308,7 @@ Reference:
      set -euo pipefail
 
      # Where to find / place things
-     DL_DIR="$HOME/projects/nvidia/nvidia_sdk/JetPack_5.1.2_Linux_JETSON_ORIN_NX_TARGETS/Linux_for_Tegra/source/public"
+     DL_DIR="$HOME/projects/nvidia"
      GLOB="/kernel_src*"
      DEST="$HOME/projects/nvidia/nvidia_sdk/JetPack_5.1.2_Linux_JETSON_ORIN_NX_TARGETS/Linux_for_Tegra/source/public/kernel_src"
 
