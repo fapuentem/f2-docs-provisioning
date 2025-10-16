@@ -265,9 +265,15 @@ EEPROM is an optional component for a customized carrier board. If the carrier b
 + cvb_eeprom_read_size = <0x0>
 #+END_SRC
 
+#+NAME: get_home
+#+BEGIN_SRC shell :results output :exports none
+  printf %s "$HOME"
+#+END_SRC
+
 #+NAME: patch_eeprom_read_size
-#+BEGIN_SRC shell :results output replace :exports both :var L4T_DIR="~/nvidia/nvidia_sdk/JetPack_5.1.2_Linux_JETSON_ORIN_NX_TARGETS/Linux_for_Tegra/bootloader/t186ref/BCT/"
+#+BEGIN_SRC shell :results output replace :exports both :var HOME=get_home()
   set -euo pipefail
+  L4T_DIR="$HOME/nvidia/nvidia_sdk/JetPack_5.1.2_Linux_JETSON_ORIN_NX_TARGETS/Linux_for_Tegra/bootloader/t186ref/BCT/"
 
   # 1) Locate the MB2 BCT "misc" DTS (common paths vary by L4T release)
   target_name="tegra234-mb2-bct-misc-p3767-0000.dts"
