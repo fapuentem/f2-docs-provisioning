@@ -222,6 +222,58 @@ Reference: https://developer.nvidia.com/embedded/jetson-linux-r3541
    #+RESULTS:
    : ✅ Extracted public_sources.tbz2 into '/home/fabricio/projects/nvidia/nvidia_sdk/JetPack_5.1.2_Linux_JETSON_ORIN_NX_TARGETS' (63 files).
 
+4. Uncompress kernel source code
+
+   #+BEGIN_SRC shell :results output replace :exports both
+     # mkdir -p ./kernel_src
+     # tar xvf ./kernel_src.tbz2 -C ./kernel_src
+     set -euo pipefail
+
+     # Where to find / place things
+     DL_DIR="$HOME/projects/nvidia"
+     GLOB="/kernel_src*"
+     DEST="$HOME/projects/nvidia/nvidia_sdk/JetPack_5.1.2_Linux_JETSON_ORIN_NX_TARGETS/Linux_for_Tegra/source/public/kernel_src"
+
+     # Find newest matching tarball
+     SRC="$(ls -t "$DL_DIR"/$GLOB 2>/dev/null | head -n1 || true)"
+     if [ -z "${SRC:-}" ] || [ ! -f "$SRC" ]; then
+       echo "❌ No tarball found matching $DL_DIR/$GLOB"
+       exit 1
+     fi
+
+     # Quick sanity: verify it's a tar archive we can list
+     if ! tar -tf "$SRC" >/dev/null 2>&1; then
+       echo "❌ '$SRC' does not look like a valid tar archive."
+       exit 2
+     fi
+
+     # Replace destination
+     rm -rf "$DEST"
+     mkdir -p "$DEST"
+
+     # Pick decompression flag based on extension (xz/gz/bz2/none)
+     case "$SRC" in
+       ,*.tar.xz|*.txz)  DFLAG="J" ;;
+       ,*.tar.gz|*.tgz)  DFLAG="z" ;;
+       ,*.tar.bz2|*.tbz2) DFLAG="j" ;;
+       ,*.tar)           DFLAG=""  ;;
+       ,*)               DFLAG=""  ;;
+     esac
+
+     # Extract quietly into DEST
+     if ! tar -x${DFLAG}f "$SRC" -C "$DEST" --warning=no-unknown-keyword; then
+       echo "❌ Extraction failed."
+       exit 3
+     fi
+
+     # Simple success summary
+     FILES=$(find "$DEST" -type f | wc -l | tr -d ' ')
+     echo "✅ Extracted $(basename "$SRC") into '$DEST' ($FILES files)."
+   #+END_SRC
+
+   #+RESULTS:
+
+
 *  EEPROM Modifications
 Reference: https://docs.nvidia.com/jetson/archives/r35.3.1/DeveloperGuide/text/HR/JetsonModuleAdaptationAndBringUp/JetsonOrinNxNanoSeries.html#eeprom-modifications
 
@@ -300,94 +352,105 @@ Reference:
 - https://forums.developer.nvidia.com/t/how-to-enable-the-pcie3-of-orin-nano/254908
 - https://forums.developer.nvidia.com/t/how-to-enable-pcie3-with-orin-nano/335945
 
-** Uncompress kernel source code
+** Modify ODMDATA
 
-   #+BEGIN_SRC shell :results output replace :exports both
-     # mkdir -p ./kernel_src
-     # tar xvf ./kernel_src.tbz2 -C ./kernel_src
-     set -euo pipefail
+#+NAME: patch_odmdata_p3767
+#+BEGIN_SRC shell :results output replace :exports both :var HOME=get_home()
+  set -euo pipefail
 
-     # Where to find / place things
-     DL_DIR="$HOME/projects/nvidia"
-     GLOB="/kernel_src*"
-     DEST="$HOME/projects/nvidia/nvidia_sdk/JetPack_5.1.2_Linux_JETSON_ORIN_NX_TARGETS/Linux_for_Tegra/source/public/kernel_src"
+  # Expand ~ if present
+  BASE_DIR="$HOME/nvidia/nvidia_sdk/JetPack_5.1.2_Linux_JETSON_ORIN_NX_TARGETS"
+  TARGET_NAME="p3767.conf.common"
 
-     # Find newest matching tarball
-     SRC="$(ls -t "$DL_DIR"/$GLOB 2>/dev/null | head -n1 || true)"
-     if [ -z "${SRC:-}" ] || [ ! -f "$SRC" ]; then
-       echo "❌ No tarball found matching $DL_DIR/$GLOB"
-       exit 1
-     fi
+  # 1) Locate the file
+  target="$(find -L "$BASE_DIR" -type f -name "$TARGET_NAME" 2>/dev/null | head -n1 || true)"
+  if [ -z "$target" ]; then
+    echo "ERROR: $TARGET_NAME not found under: $BASE_DIR"
+    exit 1
+  fi
+  echo "Target: $target"
 
-     # Quick sanity: verify it's a tar archive we can list
-     if ! tar -tf "$SRC" >/dev/null 2>&1; then
-       echo "❌ '$SRC' does not look like a valid tar archive."
-       exit 2
-     fi
+  # 2) Desired ODMDATA
+  desired='ODMDATA="gbe-uphy-config-9,hsstp-lane-map-3,hsio-uphy-config-0"'
 
-     # Replace destination
-     rm -rf "$DEST"
-     mkdir -p "$DEST"
+  # 3) Show current value
+  echo "Before:"
+  grep -nE '^[[:space:]]*ODMDATA[[:space:]]*=' "$target" || echo "<not found>"
 
-     # Pick decompression flag based on extension (xz/gz/bz2/none)
-     case "$SRC" in
-       ,*.tar.xz|*.txz)  DFLAG="J" ;;
-       ,*.tar.gz|*.tgz)  DFLAG="z" ;;
-       ,*.tar.bz2|*.tbz2) DFLAG="j" ;;
-       ,*.tar)           DFLAG=""  ;;
-       ,*)               DFLAG=""  ;;
-     esac
+  # 4) If already set, skip; otherwise patch safely
+  if grep -qE "^[[:space:]]*ODMDATA[[:space:]]*=[[:space:]]*\"gbe-uphy-config-9,hsstp-lane-map-3,hsio-uphy-config-0\"" "$target"; then
+    echo "No change needed (ODMDATA already set)."
+    backup=""
+  else
+    ts="$(date +%Y%m%d-%H%M%S)"
+    backup="${target}.bak.${ts}"
+    cp -a -- "$target" "$backup"
 
-     # Extract quietly into DEST
-     if ! tar -x${DFLAG}f "$SRC" -C "$DEST" --warning=no-unknown-keyword; then
-       echo "❌ Extraction failed."
-       exit 3
-     fi
+    # Replace the uncommented ODMDATA assignment (ignore lines starting with '#')
+    perl -0777 -pe 's/^(?!\s*#)\s*ODMDATA\s*=\s*".*?"/ODMDATA="gbe-uphy-config-9,hsstp-lane-map-3,hsio-uphy-config-0"/m' \
+      > "${target}.tmp.$$" < "$target"
+    mv -- "${target}.tmp.$$" "$target"
 
-     # Simple success summary
-     FILES=$(find "$DEST" -type f | wc -l | tr -d ' ')
-     echo "✅ Extracted $(basename "$SRC") into '$DEST' ($FILES files)."
-   #+END_SRC
+    echo "Backup created: $backup"
+    echo "Patch applied."
+  fi
 
-   #+RESULTS:
-   : ✅ Extracted kernel_src.tbz2 into '/home/fabricio/projects/nvidia/nvidia_sdk/JetPack_5.1.2_Linux_JETSON_ORIN_NX_TARGETS/Linux_for_Tegra/source/public/kernel_src' (81613 files).
+  # 5) Verify and show minimal diff
+  echo "After:"
+  grep -nE '^[[:space:]]*ODMDATA[[:space:]]*=' "$target" || echo "<not found>"
+
+  if [ -n "${backup:-}" ]; then
+    echo
+    echo "Diff:"
+    if command -v colordiff >/dev/null 2>&1; then
+      colordiff -u "$backup" "$target" | sed -n '1,80p'
+    else
+      diff -u "$backup" "$target" | sed -n '1,80p'
+    fi
+  fi
+#+END_SRC
+
+#+RESULTS: patch_odmdata_p3767
+: ERROR: p3767.conf.common not found under: /home/fabricio/nvidia/nvidia_sdk/JetPack_5.1.2_Linux_JETSON_ORIN_NX_TARGETS
+
+** Update DTS
 
 ** Build DTB
 
-    #+NAME : build-dtbs
-   #+BEGIN_SRC shell :results output replace :exports both :dir ~/projects/nvidia/nvidia_sdk/JetPack_5.1.2_Linux_JETSON_ORIN_NX_TARGETS/Linux_for_Tegra/source/public/kernel_src/kernel/kernel-5.10  :var cross="~/tools/bootlin-toolchain-gcc-93/bin/aarch64-buildroot-linux-gnu-" :var dtb_target="dtbs"
+#+NAME : build-dtbs
+#+BEGIN_SRC shell :results output replace :exports both :dir ~/projects/nvidia/nvidia_sdk/JetPack_5.1.2_Linux_JETSON_ORIN_NX_TARGETS/Linux_for_Tegra/source/public/kernel_src/kernel/kernel-5.10  :var cross="~/tools/bootlin-toolchain-gcc-93/bin/aarch64-buildroot-linux-gnu-" :var dtb_target="dtbs"
 
-     set -euo pipefail
+  set -euo pipefail
 
-     echo "== ENV =="
-     export ARCH=arm64
-     export CROSS_COMPILE="$cross"
-     OUT=../../build
-     echo "ARCH=$ARCH"
-     echo "CROSS_COMPILE=$CROSS_COMPILE"
-     echo "OUT=$OUT"
-     mkdir -p "$OUT"
+  echo "== ENV =="
+  export ARCH=arm64
+  export CROSS_COMPILE="$cross"
+  OUT=../../build
+  echo "ARCH=$ARCH"
+  echo "CROSS_COMPILE=$CROSS_COMPILE"
+  echo "OUT=$OUT"
+  mkdir -p "$OUT"
 
-     echo
-     echo "== Generating .config =="
-     make O="$OUT" tegra_defconfig
+  echo
+  echo "== Generating .config =="
+  make O="$OUT" tegra_defconfig
 
-     echo
-     echo "== Building target: $dtb_target =="
-     # dtb_target can be "dtbs" or a specific file like tegra234-...a1.dtb
-     make -j"$(nproc)" O="$OUT" "$dtb_target"
+  echo
+  echo "== Building target: $dtb_target =="
+  # dtb_target can be "dtbs" or a specific file like tegra234-...a1.dtb
+  make -j"$(nproc)" O="$OUT" "$dtb_target"
 
-     echo
-     echo "== Artifacts (top 20) =="
-     ls -1 "$OUT/arch/arm64/boot/dts/nvidia/" | head -n 20
+  echo
+  echo "== Artifacts (top 20) =="
+  ls -1 "$OUT/arch/arm64/boot/dts/nvidia/" | head -n 20
 
-     echo
-     echo "Done."
+  echo
+  echo "Done."
 #+END_SRC
 
 #+RESULTS:
 
-** Copy the rebuilt DTB to your Jetson
+** Copy the DTBs to your Jetson
 
 
 * Fix the AX210 Bluetooth
